@@ -8,7 +8,7 @@ context: |
   de Medellín vea las próximas clases grupales, reserve y cancele desde el celular.
   Fuente funcional: docs/insumo/insumo_funcional_ClaseFit.md (HU-01..HU-03, RN-01..RN-04).
 
-  Stack: Expo SDK 57 + React Native 0.86 + TypeScript estricto; navegación con expo-router
+  Stack: Expo SDK 57 + React Native 0.86 + TypeScript estricto; navegación con React Navigation
   (pestañas "Próximas clases" y "Mis reservas"); plataformas Android e iOS (sin web).
   Pruebas: Jest (preset jest-expo) + React Native Testing Library; la suite corre con
   TZ=Pacific/Kiritimati (UTC+14) para detectar dependencias de la zona del dispositivo.
@@ -18,7 +18,7 @@ context: |
   - src/application: casos de uso y puertos (Clock, ClassCatalog, BookingRepository...).
   - src/infrastructure: adaptadores (catálogo JSON validado, AsyncStorage, cifrado, SecureStore).
   - src/presentation: pantallas, componentes, hooks view-model y textos al usuario.
-  - src/di: composition root; app/: solo rutas de expo-router.
+  - src/di: composition root; App.tsx: raíz que monta dependencias y navegación.
   - __tests__/: pruebas; __tests__/acceptance nombra cada prueba como el Scenario de la spec.
   Fronteras entre capas verificadas por ESLint (no-restricted-imports).
 

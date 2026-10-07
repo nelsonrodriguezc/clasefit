@@ -4,7 +4,7 @@
 
 Mobile app that lets members of the ClaseFit gym (Laureles branch, Medellín) see upcoming group classes, book a spot and cancel their bookings from their phone. It is the MVP of KEPPRI's technical test, built with Spec-Driven Development (OpenSpec) on Expo + React Native + TypeScript.
 
-> **Repository status:** Phase 2 (proposal, specs, design and tasks). Screens and business rules are implemented in Phase 3; sections marked as *pending* are completed in the phase shown.
+> **Repository status:** Phase 3 (implementation and verification). The app is complete and tested; sections marked as *pending* are completed in the phase shown.
 
 ## 1. What ClaseFit is
 
@@ -80,7 +80,14 @@ Expected result: `v20.x.x` or higher for Node and `10.x.x` or higher for npm.
    npx expo start --tunnel
    ```
 
-*Pending (Phase 3):* description of the "Próximas clases" (upcoming classes) and "Mis reservas" (my bookings) screens.
+4. Use the app. It has two tabs (the UI is in Spanish):
+
+   | Tab | What it shows | What you can do |
+   |---|---|---|
+   | **Próximas clases** (upcoming classes) | Today's, tomorrow's and the day after tomorrow's classes that have not started (Bogotá time), with day, time, duration, instructor and spots ("5 de 20 cupos" or "Llena" = full). | Tap **Reservar** (book). If the booking passes RN-01 to RN-03 you see "¡Listo! Tu cupo está reservado" and the class is marked **Reservada** (booked); otherwise you see the message of the rule that failed. |
+   | **Mis reservas** (my bookings) | Your bookings of classes that have not started, closest first, or "Aún no tienes reservas" (no bookings yet). | Tap **Cancelar reserva** and confirm with **Sí, cancelar**. With less than 2 hours left you see "Ya no puedes cancelar: faltan menos de 2 horas.". |
+
+   Bookings are stored encrypted on the device: they are still there after closing and reopening the app. Screenshots of every flow on an Android emulator: [docs/evidencias](docs/evidencias/README.md).
 
 ## 5. Run the tests
 
@@ -88,7 +95,7 @@ Expected result: `v20.x.x` or higher for Node and `10.x.x` or higher for npm.
 |---|---|---|
 | All tests | `npm test` | `Tests: N passed, N total` |
 | Tests with coverage | `npm run test:coverage` | summary in the terminal and HTML report in `coverage/lcov-report/index.html` |
-| A single file | `npx jest __tests__/setup/timezone.test.ts` | `1 passed` |
+| A single file | `npx jest __tests__/acceptance/class-booking.test.ts` | `Tests: 33 passed, 33 total` |
 | TypeScript types | `npm run typecheck` | finishes with no messages |
 | Style and layer boundaries | `npm run lint` | finishes with no messages |
 | All of the above + OpenSpec | `npm run verify` | every step finishes without errors |
@@ -104,6 +111,16 @@ Run the full verification (the same one continuous integration runs):
 ```bash
 npm run verify
 ```
+
+How the tests are organized:
+
+| Folder | Content |
+|---|---|
+| `__tests__/acceptance/` | One suite per spec: one `describe` per Requirement and one `it` per Scenario, with the same OpenSpec names. |
+| `__tests__/traceability.test.ts` | Fails if any Requirement or Scenario of the specs has no test. |
+| `__tests__/domain/`, `application/`, `infrastructure/`, `presentation/` | Unit and integration tests of each layer (including rules RN-01 to RN-04 at their boundaries, encryption and the UI). |
+
+`npm run test:coverage` enforces minimum coverage: 100% of lines in `src/domain` and `src/application` and 95% overall; the command fails below that.
 
 Tests always run with the `Pacific/Kiritimati` time zone (UTC+14), set in `jest.config.js`. This guarantees that date calculations use Bogotá time and not the computer's time zone. Do not change the `TZ` variable when running the tests.
 
@@ -150,7 +167,7 @@ Layered architecture (Clean Architecture) following SOLID principles, with bound
 | Application | `src/application` | Use cases and ports (interfaces). |
 | Infrastructure | `src/infrastructure` | JSON catalog, encrypted storage, secure key, clock. |
 | Presentation | `src/presentation` | Screens, components, hooks and user-facing copy. |
-| Composition | `src/di` and `app/` | Wires implementations into use cases; expo-router routes. |
+| Composition | `src/di` and `App.tsx` | Wires implementations into use cases and mounts navigation. |
 
 The decisions (structure, state, dates, rules, encrypted persistence, SOLID map and discarded alternatives) are in [design.md](openspec/changes/add-class-booking/design.md) (in Spanish). Security summary: bookings are stored in AsyncStorage only encrypted with AES-256-GCM; the 256-bit key is generated on the device and lives only in SecureStore (Keychain on iOS, Keystore on Android); if the stored data was tampered with, it is discarded (fail-closed).
 
@@ -158,8 +175,10 @@ The decisions (structure, state, dates, rules, encrypted persistence, SOLID map 
 
 | Path | Content |
 |---|---|
-| `app/` | expo-router routes (Phase 3). |
-| `src/` | App code by layer (Phase 3). |
+| `App.tsx`, `index.ts` | App root: dependencies and tab navigation. |
+| `src/` | App code by layer (`domain`, `application`, `infrastructure`, `presentation`, `di`). |
+| `__mocks__/` | Jest doubles of the native modules (real AES-GCM over WebCrypto, SecureStore and AsyncStorage). |
+| `docs/evidencias/` | Android smoke-test screenshots and the encryption-at-rest check. |
 | `__tests__/` | Jest tests. |
 | `openspec/` | Context, changes and specifications. |
 | `docs/insumo/` | Functional input and original data delivered by KEPPRI. |

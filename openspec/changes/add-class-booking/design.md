@@ -26,11 +26,11 @@ Proyecto Expo SDK 57 (React Native 0.86, TypeScript 6 estricto) recién creado, 
 
 ### D1 · Estructura del proyecto: Clean Architecture por capas
 ```
-app/                 rutas expo-router (solo composición): _layout (Tabs + provider), index, reservas
+App.tsx              raíz: crea las dependencias (composition root) y monta DependenciesProvider + navegación
 src/domain/          TS puro: model/, time/, rules/, errors/
 src/application/     ports/ (interfaces) + use-cases/ + SerialExecutor
 src/infrastructure/  catalog/, persistence/, security/, time/, ids/, logging/
-src/presentation/    screens/, components/, hooks/ (view-models), messages.ts, formatters.ts
+src/presentation/    navigation/ (pestañas), screens/, components/, hooks/ (view-models), messages.ts, formatters.ts
 src/di/              composition root: único lugar que instancia adaptadores
 ```
 La dependencia apunta siempre hacia adentro (presentation → application → domain; infrastructure → application). ESLint (`no-restricted-imports`) rompe el build si una capa importa algo prohibido. *Alternativa considerada:* estructura por pantallas ("feature folders") — más simple, pero mezcla reglas con UI y no permite probar las reglas sin React.
@@ -49,7 +49,7 @@ Cada regla es una clase del dominio que implementa `BookingRule` o `Cancellation
 ### D4 · Manejo de estado
 - Fuente de verdad: el `BookingRepository` (memoria + almacenamiento cifrado). El catálogo es inmutable.
 - Cada pantalla usa un hook view-model (`useUpcomingClasses`, `useMyBookings`) que llama casos de uso, expone `loading | ready | error`, la acción en curso y el mensaje de retroalimentación. Recarga al enfocar la pestaña (`useFocusEffect`), así ambas pestañas reflejan los cambios de la otra.
-- Las dependencias llegan por `DependenciesProvider` (React Context) creado en `app/_layout.tsx`.
+- Las dependencias llegan por `DependenciesProvider` (React Context) creado en `App.tsx`.
 - *Alternativa descartada:* Redux/Zustand. Dos pantallas con estado derivado del repositorio no justifican un store global ni otra dependencia; duplicaría la fuente de verdad.
 
 ### D5 · Concurrencia
@@ -77,7 +77,7 @@ Booking[] → JSON validado → AES-256-GCM (nonce 12 B aleatorio, AAD = clave+v
 Puerto `Logger` con eventos por código (`storage.integrity_failure`, `storage.write_failure`...) y metadatos sin PII. `ConsoleLogger` solo escribe si `__DEV__`; en producción es silencioso (punto de extensión para un monitor externo).
 
 ### D9 · Navegación y UI
-expo-router con `Tabs` en `app/`: "Próximas clases" (`index`) y "Mis reservas" (`reservas`). Confirmación de cancelación con un `ConfirmDialog` propio sobre `Modal` (probable con Testing Library y consistente entre plataformas). Retroalimentación con un `FeedbackBanner` con `accessibilityLiveRegion` para lectores de pantalla. Iconos con `@expo/vector-icons` (paquete de Expo).
+React Navigation (`@react-navigation/bottom-tabs`) con dos pestañas: "Próximas clases" y "Mis reservas", definidas en `src/presentation/navigation`. *Alternativa descartada durante el apply:* **expo-router**. Al instalarlo en SDK 57 arrastró decenas de paquetes adicionales (entre ellos radix-ui, vaul y @expo/ui) y peers nativos que npm resolvió en versiones incompatibles con el SDK (react-native-reanimated 4.7.1 y react-native-worklets 0.13.0, cuando el SDK espera 4.5.1 y 0.10.1), además de un conflicto `react-dom@19.3.0` vs `react@19.2.3` que bloqueó `npm install`. Para dos pestañas, React Navigation —la base sobre la que está construido expo-router— da el mismo resultado con solo dos módulos nativos (react-native-screens y react-native-safe-area-context) y sin rutas de deep link expuestas. Confirmación de cancelación con un `ConfirmDialog` propio sobre `Modal` (fácil de probar con Testing Library y consistente entre plataformas). Retroalimentación con un `FeedbackBanner` con `accessibilityLiveRegion` para lectores de pantalla. Iconos con `@expo/vector-icons` (paquete de Expo).
 
 ### D10 · Mapa SOLID
 | Principio | Dónde se cumple |
@@ -89,7 +89,7 @@ expo-router con `Tabs` en `app/`: "Próximas clases" (`index`) y "Mis reservas" 
 | **D** — inversión de dependencias | Casos de uso dependen de puertos; adaptadores Expo solo se instancian en `src/di`; ESLint impide atajos. |
 
 ### D11 · Dependencias nuevas
-expo-router (+ react-native-safe-area-context, react-native-screens, expo-linking, expo-constants, expo-status-bar) para navegación; expo-secure-store y expo-crypto para custodia de llave y cifrado; @react-native-async-storage/async-storage para persistencia; zod para validación; @expo/vector-icons para iconos. Todas son de Expo o ampliamente auditadas; versiones fijadas por `package-lock.json`.
+@react-navigation/native y @react-navigation/bottom-tabs (+ react-native-screens, react-native-safe-area-context) para navegación; expo-secure-store y expo-crypto para custodia de llave y cifrado; @react-native-async-storage/async-storage para persistencia; zod para validación; @expo/vector-icons (+ expo-font y expo-asset, que expo-font necesita en tiempo de ejecución) para iconos. Todas son de Expo o ampliamente auditadas; versiones fijadas por `package-lock.json`.
 
 ## Risks / Trade-offs
 
@@ -97,7 +97,8 @@ expo-router (+ react-native-safe-area-context, react-native-screens, expo-linkin
 - [Desinstalar la app pierde las reservas (Android borra SecureStore y AsyncStorage)] → Aceptado: el MVP no tiene backend; queda en el checklist de release.
 - [En iOS la llave sobrevive a la desinstalación, AsyncStorage no] → Sin impacto: al reinstalar no hay datos y la llave vieja se reutiliza o se reemplaza.
 - [Dispositivo con root y desbloqueado puede usar el Keystore como oráculo] → Fuera del modelo de amenaza del MVP; mitigable con attestation y detección de root cuando exista backend.
-- [El doble de `expo-crypto` en Jest podría no reflejar la API real] → El doble implementa AES-GCM real y la prueba en emulador (Expo Go y APK) valida el adaptador real.
+- [El doble de `expo-crypto` en Jest podría no reflejar la API real] → El doble implementa AES-GCM real y la prueba en emulador valida el adaptador real. **Ocurrió durante el apply:** en Android, `AESSealedData.fromCombined` solo acepta bytes aunque los tipos de expo-crypto permiten base64; el emulador mostró `storage.integrity_failure` al reabrir la app. Ahora el cifrador solo cruza bytes por la frontera nativa (codec Base64 propio, probado con los vectores del RFC 4648) y el doble rechaza cadenas como Android.
+- [Con datos mock relativos (`diaOffset`), al cambiar el día el catálogo "mueve" las clases: la Yoga de mañana a las 18:00 pasa a ser otra entrada del JSON] → La reserva guarda su instantánea y su sesión `claseId@fecha`, por eso se sigue mostrando y validando bien; con un backend real cada sesión tendría un identificador estable.
 - [Purga al iniciar reduce historial] → Intencional (minimización); no hay requisito de historial.
 - [Ambigüedad del límite de RN-04 (≥ 2 h vs > 2 h)] → Supuesto S1 aplicado y probado en el borde exacto; cambiarlo afecta una comparación y un escenario.
 
