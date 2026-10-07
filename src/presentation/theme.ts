@@ -1,26 +1,37 @@
-/** Design tokens. Text/background pairs meet WCAG AA contrast (4.5:1 or more). */
+/**
+ * Design tokens. The first group is the mockup palette; the derived colors exist so that every
+ * text/background pair reaches WCAG AA contrast (4.5:1 or more). The app-shell acceptance suite
+ * computes those ratios, so a token change that breaks contrast fails the build.
+ */
 export const colors = {
-  background: '#081220',
-  surface: '#0B1B2C',
-  surfaceRaised: '#10263A',
-  surfaceMuted: '#132D43',
+  // Mockup palette
+  background: '#0B1220',
+  surface: '#1A2332',
   text: '#F8FAFC',
-  muted: '#A8B8C8',
-  border: '#294057',
+  muted: '#94A3B8',
   primary: '#22C55E',
   primaryLight: '#86EFAC',
   primaryDark: '#065F46',
-  onPrimary: '#04110A',
   danger: '#EF4444',
-  dangerSurface: '#30151D',
-  success: '#22C55E',
-  successSurface: '#073D35',
+  // Derived
+  surfaceRaised: '#243044',
+  border: '#2B3A4F',
+  tabBar: '#0F1828',
+  onPrimary: '#052E16',
+  dangerText: '#F87171',
+  dangerStrong: '#B91C1C',
+  onDanger: '#FFFFFF',
+  successSurface: '#0D2B22',
+  dangerSurface: '#2A1520',
   warning: '#F59E0B',
-  warningSurface: '#3A2A0D',
-  badgeSurface: '#0F624D',
-  badgeText: '#BBF7D0',
-  disabled: '#64748B',
-  overlay: 'rgba(1, 8, 18, 0.78)',
+  warningText: '#FBBF24',
+  warningSurface: '#2A2414',
+  badgeSurface: '#065F46',
+  badgeText: '#86EFAC',
+  // Translucent accents (icons and borders only, never behind text)
+  primaryTint: 'rgba(34, 197, 94, 0.14)',
+  primaryBorder: 'rgba(34, 197, 94, 0.45)',
+  overlay: 'rgba(2, 6, 15, 0.8)',
 } as const;
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
@@ -33,7 +44,7 @@ export const shadows = {
     shadowOpacity: 0.24,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
+    elevation: 4,
   },
 } as const;
 

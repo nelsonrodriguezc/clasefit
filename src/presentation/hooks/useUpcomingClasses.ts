@@ -7,9 +7,13 @@ import type { Feedback } from '../feedback';
 import { failure, success } from '../feedback';
 import { ERROR_MESSAGES, TEXTS } from '../messages';
 import type { ScreenState } from './ScreenState';
+import { useCancellation } from './useCancellation';
 import { useRefreshOnFocus } from './useRefreshOnFocus';
 
-/** View-model of "Próximas clases": state for the screen, actions delegated to use cases. */
+/**
+ * View-model of "Próximas clases" (and its class detail): state for the screen, actions delegated
+ * to use cases. Cancelling from the detail reuses the flow of "Mis reservas".
+ */
 export function useUpcomingClasses() {
   const { listUpcomingClasses, bookClass } = useDependencies();
   const [state, setState] = useState<ScreenState<UpcomingClass>>({ status: 'loading' });
@@ -44,5 +48,7 @@ export function useUpcomingClasses() {
     [bookClass, refresh],
   );
 
-  return { state, pendingSessionId, feedback, dismissFeedback, book, refresh };
+  const cancellation = useCancellation(refresh, setFeedback);
+
+  return { state, pendingSessionId, feedback, dismissFeedback, book, refresh, cancellation };
 }

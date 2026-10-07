@@ -45,6 +45,13 @@ export class StaticMemberSession implements MemberSession {
   }
 }
 
+/** Member data that fails validation (like an invalid bundled file). */
+export class BrokenMemberSession implements MemberSession {
+  async current(): Promise<Member> {
+    throw new Error('invalid member');
+  }
+}
+
 export class SequentialIds implements IdGenerator {
   private counter = 0;
   next(): string {

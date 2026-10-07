@@ -6,6 +6,12 @@ export type ListUpcomingClassesError = 'CATALOG_UNAVAILABLE' | 'UNEXPECTED';
 export type BookClassError = BookingViolation | 'SESSION_NOT_FOUND' | 'UNEXPECTED';
 export type ListMyBookingsError = 'UNEXPECTED';
 export type CancelBookingError = CancellationViolation | 'BOOKING_NOT_FOUND' | 'UNEXPECTED';
+export type GetMemberProfileError = 'UNEXPECTED';
 
 /** Every code the UI may have to explain to the member. */
-export type AppErrorCode = ListUpcomingClassesError | BookClassError | ListMyBookingsError | CancelBookingError;
+export type AppErrorCode =
+  | ListUpcomingClassesError
+  | BookClassError
+  | ListMyBookingsError
+  | CancelBookingError
+  | GetMemberProfileError;

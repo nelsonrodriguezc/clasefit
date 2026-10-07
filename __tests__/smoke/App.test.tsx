@@ -1,25 +1,29 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 
 import App from '../../App';
-import { waitForLoaded } from '../support/renderApp';
+import { openTab, tabButtons, waitForLoaded } from '../support/renderApp';
+
+const startRealApp = async () => {
+  await render(<App />);
+  await waitForLoaded();
+};
 
 describe('App (composición real sobre los dobles nativos)', () => {
-  it('arranca con las pestañas "Próximas clases" y "Mis reservas" y muestra clases del catálogo', async () => {
-    await render(<App />);
-    await waitForLoaded();
+  it('arranca con las tres pestañas, saluda a la socia del catálogo y muestra clases', async () => {
+    await startRealApp();
 
-    expect(screen.getAllByText('Próximas clases').length).toBeGreaterThan(0);
-    expect(screen.getByText('Mis reservas')).toBeOnTheScreen();
+    expect(tabButtons()).toHaveLength(3);
+    expect(await screen.findByText(/^Hola, Laura/)).toBeOnTheScreen();
     expect((await screen.findAllByTestId(/^class-/)).length).toBeGreaterThan(0);
   });
 
-  it('permite acceder al perfil desde el shell autenticado', async () => {
-    await render(<App />);
-    await waitForLoaded();
+  it('el perfil muestra los datos de la socia del catálogo empaquetado', async () => {
+    await startRealApp();
 
-    await fireEvent.press(screen.getByText('Perfil'));
+    await openTab('Perfil');
 
     expect(screen.getByTestId('profile')).toBeOnTheScreen();
     expect(screen.getByText('Laura Gómez')).toBeOnTheScreen();
+    expect(screen.getByText('S-0001')).toBeOnTheScreen();
   });
 });

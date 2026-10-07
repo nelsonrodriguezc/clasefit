@@ -31,6 +31,20 @@ describe('Configuración de release', () => {
     expect(appJson.ios.privacyManifests).toMatchObject({ NSPrivacyTracking: false, NSPrivacyCollectedDataTypes: [] });
   });
 
+  it('usa la identidad visual en el ícono y en el splash nativo (fondo oscuro, sin destello blanco)', () => {
+    expect(appJson.icon).toBe('./assets/icon.png');
+    expect(appJson.userInterfaceStyle).toBe('dark');
+    expect(appJson.android.adaptiveIcon).toMatchObject({
+      backgroundColor: '#0B1220',
+      foregroundImage: './assets/android-icon-foreground.png',
+      monochromeImage: './assets/android-icon-monochrome.png',
+    });
+    expect(appJson.plugins).toContainEqual([
+      'expo-splash-screen',
+      expect.objectContaining({ backgroundColor: '#0B1220', image: './assets/splash-icon.png' }),
+    ]);
+  });
+
   it('tiene perfiles preview (APK interno) y production (AAB con versión autoincremental)', () => {
     expect(easJson.build.preview).toMatchObject({ distribution: 'internal', android: { buildType: 'apk' } });
     expect(easJson.build.production).toMatchObject({ autoIncrement: true, android: { buildType: 'app-bundle' } });

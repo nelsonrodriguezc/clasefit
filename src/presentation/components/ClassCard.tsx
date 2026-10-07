@@ -1,71 +1,85 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { UpcomingClass } from '@/application/views';
 
-import { dayLabel, spotsLabel, timeLabel } from '../formatters';
-import { TEXTS } from '../messages';
-import { colors, radius, spacing } from '../theme';
-import { PrimaryButton } from './PrimaryButton';
+import { disciplineOf } from '../disciplines';
+import { dayLabel, timeLabel } from '../formatters';
+import { A11Y, TEXTS } from '../messages';
+import { colors, spacing } from '../theme';
+import { Badge } from './Badge';
 import { GlassCard } from './GlassCard';
+import { IconTile } from './IconTile';
+import { InfoRow, SpotsRow } from './InfoRow';
+import { PrimaryButton } from './PrimaryButton';
 
 interface Props {
   readonly item: UpcomingClass;
   readonly busy: boolean;
   readonly disabled: boolean;
   readonly onBook: (sessionId: string) => void;
-  readonly onOpen: (item: UpcomingClass) => void;
+  readonly onOpen: (sessionId: string) => void;
 }
 
 /** One upcoming class. Rules are not evaluated here: the card only renders the state it receives. */
 export function ClassCard({ item, busy, disabled, onBook, onOpen }: Props) {
   const when = `${dayLabel(item.daysFromToday, item.date)} · ${timeLabel(item.startsAt)}`;
-  const availability = item.isFull ? TEXTS.full : spotsLabel(item.availableSpots, item.capacity);
+  const canBook = !item.isFull && !item.isBookedByMember;
 
   return (
-    <GlassCard padded={false}>
-      <View testID={`class-${item.sessionId}`} style={styles.card}>
-      <Pressable accessibilityRole="button" accessibilityLabel={`Ver detalle de ${item.name}`} onPress={() => onOpen(item)} style={styles.header}>
-        <Text style={styles.name}>{item.name}</Text>
-        {item.isBookedByMember && (
-          <Text style={styles.badge} accessibilityLabel={`${TEXTS.booked}: ${item.name}`}>
-            {TEXTS.booked}
-          </Text>
-        )}
+    <GlassCard testID={`class-${item.sessionId}`} padded={false}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={A11Y.openDetail(item.name, when)}
+        onPress={() => onOpen(item.sessionId)}
+        style={({ pressed }) => [styles.body, pressed && styles.pressed]}
+      >
+        <IconTile icon={disciplineOf(item.name).icon} />
+        <View style={styles.info}>
+          <View style={styles.titleRow}>
+            <Text style={styles.name} numberOfLines={1}>
+              {item.name}
+            </Text>
+            {item.isBookedByMember && <Badge tone="success" label={TEXTS.booked} />}
+            {item.isFull && <Badge tone="danger" label={TEXTS.full} />}
+          </View>
+          <InfoRow icon="calendar-outline">{`${when} · ${item.durationMin} min`}</InfoRow>
+          <InfoRow icon="person-outline">{`Instructor: ${item.instructor}`}</InfoRow>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={colors.muted} />
       </Pressable>
-      <Text style={styles.detail}>{`${when} · ${item.durationMin} min`}</Text>
-      <Text style={styles.detail}>{`Instructor: ${item.instructor}`}</Text>
-      <Text style={[styles.availability, item.isFull && styles.full]}>{availability}</Text>
-      {!item.isFull && !item.isBookedByMember && (
-        <PrimaryButton
-          label={TEXTS.book}
-          accessibilityLabel={`${TEXTS.book} ${item.name}, ${when}`}
-          busy={busy}
-          disabled={disabled}
-          onPress={() => onBook(item.sessionId)}
-        />
+      {!item.isFull && (
+        <View style={styles.footer}>
+          <SpotsRow available={item.availableSpots} capacity={item.capacity} />
+          {canBook && (
+            <PrimaryButton
+              compact
+              label={TEXTS.book}
+              accessibilityLabel={A11Y.book(item.name, when)}
+              busy={busy}
+              disabled={disabled}
+              onPress={() => onBook(item.sessionId)}
+            />
+          )}
+        </View>
       )}
-      </View>
     </GlassCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    padding: spacing.lg,
-    gap: spacing.xs,
+  body: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg },
+  pressed: { opacity: 0.8 },
+  info: { flex: 1, gap: spacing.xs },
+  titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.sm },
+  name: { fontSize: 18, fontWeight: '800', color: colors.text, flexShrink: 1 },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    minHeight: 48,
   },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm },
-  name: { fontSize: 18, fontWeight: '700', color: colors.text, flexShrink: 1 },
-  badge: {
-    backgroundColor: colors.badgeSurface,
-    color: colors.badgeText,
-    fontWeight: '700',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.pill,
-    overflow: 'hidden',
-  },
-  detail: { fontSize: 15, color: colors.muted },
-  availability: { fontSize: 15, fontWeight: '600', color: colors.text, marginBottom: spacing.sm },
-  full: { color: colors.danger },
 });

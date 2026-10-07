@@ -34,6 +34,10 @@ describe('Composition root (createAppDependencies)', () => {
     expect(myBookings.ok && myBookings.value.map((booking) => booking.sessionId)).toEqual(['C-07@2026-10-07']);
   });
 
+  it('lee el perfil de la socia desde los datos empaquetados del insumo', async () => {
+    expect(await compose().getMemberProfile.execute()).toEqual({ ok: true, value: { id: 'S-0001', name: 'Laura Gómez' } });
+  });
+
   it('genera identificadores de reserva no secuenciales (UUID)', async () => {
     const result = await compose().bookClass.execute('C-07@2026-10-07');
 

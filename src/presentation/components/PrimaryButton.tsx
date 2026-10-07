@@ -1,18 +1,43 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, MIN_TOUCH, radius, spacing } from '../theme';
+import type { IoniconName } from './InfoRow';
+
+type Variant = 'primary' | 'danger' | 'secondary' | 'outlineDanger';
 
 interface Props {
   readonly label: string;
   readonly onPress: () => void;
-  readonly variant?: 'primary' | 'danger' | 'secondary';
+  readonly variant?: Variant;
+  readonly icon?: IoniconName;
+  /** Pill-shaped and narrow, for the action inside a card (same 48 dp touch height). */
+  readonly compact?: boolean;
   readonly disabled?: boolean;
   readonly busy?: boolean;
   readonly accessibilityLabel?: string;
 }
 
-export function PrimaryButton({ label, onPress, variant = 'primary', disabled = false, busy = false, accessibilityLabel }: Props) {
+/** Label colors: dark text on green (white on #22C55E would be 2.3:1, assumption UI-5). */
+const LABEL_COLORS: Readonly<Record<Variant, string>> = {
+  primary: colors.onPrimary,
+  danger: colors.onDanger,
+  secondary: colors.text,
+  outlineDanger: colors.dangerText,
+};
+
+export function PrimaryButton({
+  label,
+  onPress,
+  variant = 'primary',
+  icon,
+  compact = false,
+  disabled = false,
+  busy = false,
+  accessibilityLabel,
+}: Props) {
   const inactive = disabled || busy;
+  const color = LABEL_COLORS[variant];
   return (
     <Pressable
       accessibilityRole="button"
@@ -20,12 +45,15 @@ export function PrimaryButton({ label, onPress, variant = 'primary', disabled = 
       accessibilityState={{ disabled: inactive, busy }}
       disabled={inactive}
       onPress={onPress}
-      style={({ pressed }) => [styles.base, styles[variant], inactive && styles.inactive, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.base, compact && styles.compact, styles[variant], inactive && styles.inactive, pressed && styles.pressed]}
     >
       {busy ? (
-        <ActivityIndicator color={variant === 'secondary' ? colors.text : colors.onPrimary} />
+        <ActivityIndicator color={color} />
       ) : (
-        <Text style={[styles.label, variant === 'secondary' && styles.secondaryLabel]}>{label}</Text>
+        <View style={styles.content}>
+          {icon && <Ionicons name={icon} size={18} color={color} />}
+          <Text style={[styles.label, { color }]}>{label}</Text>
+        </View>
       )}
     </Pressable>
   );
@@ -39,11 +67,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  compact: { borderRadius: radius.pill, paddingHorizontal: spacing.xl, alignSelf: 'flex-end' },
+  content: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   primary: { backgroundColor: colors.primary },
-  danger: { backgroundColor: colors.danger },
-  secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  danger: { backgroundColor: colors.dangerStrong },
+  secondary: { backgroundColor: colors.surfaceRaised, borderWidth: 1, borderColor: colors.border },
+  outlineDanger: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.danger },
   inactive: { opacity: 0.5 },
   pressed: { opacity: 0.85 },
-  label: { color: colors.onPrimary, fontSize: 16, fontWeight: '600' },
-  secondaryLabel: { color: colors.text },
+  label: { fontSize: 16, fontWeight: '700' },
 });
