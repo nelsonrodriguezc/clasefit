@@ -28,7 +28,7 @@ Proyecto Expo SDK 57 (React Native 0.86, TypeScript 6 estricto) recién creado, 
 ```
 App.tsx              raíz: crea las dependencias (composition root) y monta DependenciesProvider + navegación
 src/domain/          TS puro: model/, time/, rules/, errors/
-src/application/     ports/ (interfaces) + use-cases/ + SerialExecutor
+src/application/     ports/ (interfaces) + use-cases/ + SerialTaskQueue
 src/infrastructure/  catalog/, persistence/, security/, time/, ids/, logging/
 src/presentation/    navigation/ (pestañas), screens/, components/, hooks/ (view-models), messages.ts, formatters.ts
 src/di/              composition root: único lugar que instancia adaptadores
@@ -53,7 +53,7 @@ Cada regla es una clase del dominio que implementa `BookingRule` o `Cancellation
 - *Alternativa descartada:* Redux/Zustand. Dos pantallas con estado derivado del repositorio no justifican un store global ni otra dependencia; duplicaría la fuente de verdad.
 
 ### D5 · Concurrencia
-`BookClass` y `CancelBooking` comparten un `SerialExecutor` (cola de promesas): leer reservas → validar reglas → escribir ocurre de forma atómica respecto a otras operaciones. Evita el TOCTOU de un doble toque o de dos reservas simultáneas que burlarían RN-02/RN-03. La UI además deshabilita el botón mientras la operación está en curso.
+`BookClass`, `CancelBooking` y `PurgeExpiredBookings` comparten una `TaskQueue` (puerto) implementada por `SerialTaskQueue` (cola de promesas): leer reservas → validar reglas → escribir ocurre de forma atómica respecto a otras operaciones. Evita el TOCTOU de un doble toque o de dos reservas simultáneas que burlarían RN-02/RN-03. La UI además deshabilita el botón mientras la operación está en curso.
 
 ### D6 · Persistencia segura (envelope encryption)
 ```
@@ -74,7 +74,7 @@ Booking[] → JSON validado → AES-256-GCM (nonce 12 B aleatorio, AAD = clave+v
 `zod` valida el catálogo (`clases.json`) y el contenido descifrado. Catálogo inválido → estado de error de la pantalla. *Alternativa:* validadores manuales — menos dependencias pero más código propio por mantener y probar; zod no tiene dependencias y su esquema documenta el contrato.
 
 ### D8 · Registros
-Puerto `Logger` con eventos por código (`storage.integrity_failure`, `storage.write_failure`...) y metadatos sin PII. `ConsoleLogger` solo escribe si `__DEV__`; en producción es silencioso (punto de extensión para un monitor externo).
+Puerto `Logger` con eventos por código (`storage.integrity_failure`, `storage.key_created`, `bookings.read_failed`, `bookings.write_failed`, `catalog.load_failed`) y metadatos sin PII. `ConsoleLogger` solo escribe si `__DEV__`; en producción es silencioso (punto de extensión para un monitor externo).
 
 ### D9 · Navegación y UI
 React Navigation (`@react-navigation/bottom-tabs`) con dos pestañas: "Próximas clases" y "Mis reservas", definidas en `src/presentation/navigation`. *Alternativa descartada durante el apply:* **expo-router**. Al instalarlo en SDK 57 arrastró decenas de paquetes adicionales (entre ellos radix-ui, vaul y @expo/ui) y peers nativos que npm resolvió en versiones incompatibles con el SDK (react-native-reanimated 4.7.1 y react-native-worklets 0.13.0, cuando el SDK espera 4.5.1 y 0.10.1), además de un conflicto `react-dom@19.3.0` vs `react@19.2.3` que bloqueó `npm install`. Para dos pestañas, React Navigation —la base sobre la que está construido expo-router— da el mismo resultado con solo dos módulos nativos (react-native-screens y react-native-safe-area-context) y sin rutas de deep link expuestas. Confirmación de cancelación con un `ConfirmDialog` propio sobre `Modal` (fácil de probar con Testing Library y consistente entre plataformas). Retroalimentación con un `FeedbackBanner` con `accessibilityLiveRegion` para lectores de pantalla. Iconos con `@expo/vector-icons` (paquete de Expo).

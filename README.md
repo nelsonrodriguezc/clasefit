@@ -4,7 +4,7 @@
 
 App móvil para que los socios del gimnasio ClaseFit (Sede Laureles, Medellín) vean las próximas clases grupales, reserven un cupo y cancelen sus reservas desde el celular. Es el MVP de la prueba técnica de KEPPRI, construido con Spec-Driven Development (OpenSpec) sobre Expo + React Native + TypeScript.
 
-> **Estado del repositorio:** Fase 3 (implementación y verificación). La app está completa y probada; las secciones marcadas como *pendiente* se completan en la fase indicada.
+> **Estado del repositorio:** versión 1.0.0. Ciclo SDD completo: proposal → specs → design → tasks → apply → verify → archive → release.
 
 ## 1. Qué es ClaseFit
 
@@ -151,11 +151,38 @@ openspec validate --all --strict
 | `openspec/specs/` | Especificación vigente, generada al archivar. |
 | `openspec/changes/archive/` | Historial de cambios archivados. |
 
-Cambio en curso: [`openspec/changes/add-class-booking/`](openspec/changes/add-class-booking/) con [proposal](openspec/changes/add-class-booking/proposal.md), specs [class-booking](openspec/changes/add-class-booking/specs/class-booking/spec.md) y [booking-data-protection](openspec/changes/add-class-booking/specs/booking-data-protection/spec.md), [design](openspec/changes/add-class-booking/design.md) y [tasks](openspec/changes/add-class-booking/tasks.md).
+Especificación vigente (generada al archivar): [class-booking](openspec/specs/class-booking/spec.md) y [booking-data-protection](openspec/specs/booking-data-protection/spec.md).
+
+Cambio archivado: [`openspec/changes/archive/2026-10-06-add-class-booking/`](openspec/changes/archive/2026-10-06-add-class-booking/) con [proposal](openspec/changes/archive/2026-10-06-add-class-booking/proposal.md), [design](openspec/changes/archive/2026-10-06-add-class-booking/design.md), [tasks](openspec/changes/archive/2026-10-06-add-class-booking/tasks.md) (30/30 tareas marcadas) y las specs delta.
 
 ## 7. Build y publicación (EAS)
 
-*Pendiente (Fase 4):* perfiles `preview` y `production`, comandos de build y enlace al APK. La lista de lo que falta para publicar en las tiendas estará en [checklist_release.md](checklist_release.md).
+El proyecto está vinculado a EAS: [@nelsonrodriguezc/clasefit](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit). Perfiles definidos en `eas.json`:
+
+| Perfil | Resultado | Uso |
+|---|---|---|
+| `preview` | APK instalable, distribución interna | Probar en dispositivos Android sin pasar por la tienda. |
+| `production` | AAB (Android) e IPA (iOS) con número de build autoincremental gestionado por EAS | Publicar en Google Play y App Store. |
+
+1. Inicia sesión en tu cuenta de Expo:
+
+   ```bash
+   npx eas-cli login
+   ```
+
+2. Genera el APK de prueba:
+
+   ```bash
+   npx eas-cli build --platform android --profile preview
+   ```
+
+   Resultado esperado: al terminar, la terminal muestra el enlace de descarga del APK.
+
+**APK de la versión 1.0.0:** [build `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496). Ábrelo en un celular Android para instalarlo; está verificado en un emulador Android 13 ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview)).
+
+Para construir con otra cuenta de Expo, ejecuta `npx eas-cli init` con esa cuenta: el comando reemplaza `owner` y `extra.eas.projectId` en `app.json`.
+
+Lo que falta para publicar en Google Play y App Store está en [checklist_release.md](checklist_release.md).
 
 ## 8. Arquitectura y seguridad
 
@@ -169,7 +196,7 @@ Arquitectura por capas (Clean Architecture) con principios SOLID y fronteras ver
 | Presentación | `src/presentation` | Pantallas, componentes, hooks y textos al usuario. |
 | Composición | `src/di` y `App.tsx` | Conecta implementaciones con casos de uso y monta la navegación. |
 
-Las decisiones (estructura, estado, fechas, reglas, persistencia cifrada, mapa SOLID y alternativas descartadas) están en [design.md](openspec/changes/add-class-booking/design.md). Resumen de seguridad: las reservas se guardan en AsyncStorage solo cifradas con AES-256-GCM; la llave de 256 bits se genera en el dispositivo y vive únicamente en SecureStore (Keychain en iOS, Keystore en Android); si los datos guardados fueron alterados, se descartan (falla segura).
+Las decisiones (estructura, estado, fechas, reglas, persistencia cifrada, mapa SOLID y alternativas descartadas) están en [design.md](openspec/changes/archive/2026-10-06-add-class-booking/design.md). Resumen de seguridad: las reservas se guardan en AsyncStorage solo cifradas con AES-256-GCM; la llave de 256 bits se genera en el dispositivo y vive únicamente en SecureStore (Keychain en iOS, Keystore en Android); si los datos guardados fueron alterados, se descartan (falla segura).
 
 ## 9. Estructura del repositorio
 
@@ -187,7 +214,7 @@ Las decisiones (estructura, estado, fechas, reglas, persistencia cifrada, mapa S
 
 ## 10. Supuestos clave
 
-La lista completa (S1 a S9) está en [proposal.md](openspec/changes/add-class-booking/proposal.md#supuestos). Los que más afectan el comportamiento:
+La lista completa (S1 a S9) está en [proposal.md](openspec/changes/archive/2026-10-06-add-class-booking/proposal.md#supuestos). Los que más afectan el comportamiento:
 
 - **RN-04:** se puede cancelar si faltan 2 horas o más; con exactamente 2 horas se permite.
 - **Fechas:** "hoy" es la fecha actual en America/Bogota (UTC−5), aunque el dispositivo esté en otra zona horaria.
@@ -225,5 +252,7 @@ git log --oneline --graph --all
 |---|---|
 | Insumo funcional | [docs/insumo/insumo_funcional_ClaseFit.md](docs/insumo/insumo_funcional_ClaseFit.md) |
 | Bitácora de uso de IA | [bitacora_ia.md](bitacora_ia.md) |
-| Respuestas de reflexión | *pendiente (Fase 5)* |
-| Checklist de release | *pendiente (Fase 4)* |
+| Respuestas de reflexión | [respuestas_reflexion.md](respuestas_reflexion.md) |
+| Checklist de release | [checklist_release.md](checklist_release.md) |
+| APK Android (bonus) | [build `preview` 1.0.0 en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496) |
+| Evidencias del smoke test | [docs/evidencias](docs/evidencias/README.md) |
