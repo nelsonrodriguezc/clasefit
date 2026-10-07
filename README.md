@@ -4,7 +4,7 @@
 
 App móvil para que los socios del gimnasio ClaseFit (Sede Laureles, Medellín) vean las próximas clases grupales, reserven un cupo y cancelen sus reservas desde el celular. Es el MVP de la prueba técnica de KEPPRI, construido con Spec-Driven Development (OpenSpec) sobre Expo + React Native + TypeScript.
 
-> **Estado del repositorio:** Fase 1 (setup y contexto). Las pantallas y reglas de negocio se implementan en la Fase 3; las secciones marcadas como *pendiente* se completan en esa fase.
+> **Estado del repositorio:** Fase 2 (proposal, specs, design y tasks). Las pantallas y reglas de negocio se implementan en la Fase 3; las secciones marcadas como *pendiente* se completan en la fase indicada.
 
 ## 1. Qué es ClaseFit
 
@@ -134,7 +134,7 @@ openspec validate --all --strict
 | `openspec/specs/` | Especificación vigente, generada al archivar. |
 | `openspec/changes/archive/` | Historial de cambios archivados. |
 
-*Pendiente (Fase 2):* enlace al cambio `add-class-booking`.
+Cambio en curso: [`openspec/changes/add-class-booking/`](openspec/changes/add-class-booking/) con [proposal](openspec/changes/add-class-booking/proposal.md), specs [class-booking](openspec/changes/add-class-booking/specs/class-booking/spec.md) y [booking-data-protection](openspec/changes/add-class-booking/specs/booking-data-protection/spec.md), [design](openspec/changes/add-class-booking/design.md) y [tasks](openspec/changes/add-class-booking/tasks.md).
 
 ## 7. Build y publicación (EAS)
 
@@ -152,7 +152,7 @@ Arquitectura por capas (Clean Architecture) con principios SOLID y fronteras ver
 | Presentación | `src/presentation` | Pantallas, componentes, hooks y textos al usuario. |
 | Composición | `src/di` y `app/` | Conecta implementaciones con casos de uso; rutas de expo-router. |
 
-*Pendiente (Fase 2):* enlace a `design.md` con las decisiones y el modelo de seguridad.
+Las decisiones (estructura, estado, fechas, reglas, persistencia cifrada, mapa SOLID y alternativas descartadas) están en [design.md](openspec/changes/add-class-booking/design.md). Resumen de seguridad: las reservas se guardan en AsyncStorage solo cifradas con AES-256-GCM; la llave de 256 bits se genera en el dispositivo y vive únicamente en SecureStore (Keychain en iOS, Keystore en Android); si los datos guardados fueron alterados, se descartan (falla segura).
 
 ## 9. Estructura del repositorio
 
@@ -168,7 +168,13 @@ Arquitectura por capas (Clean Architecture) con principios SOLID y fronteras ver
 
 ## 10. Supuestos clave
 
-*Pendiente (Fase 2):* resumen de los supuestos registrados en `proposal.md`.
+La lista completa (S1 a S9) está en [proposal.md](openspec/changes/add-class-booking/proposal.md#supuestos). Los que más afectan el comportamiento:
+
+- **RN-04:** se puede cancelar si faltan 2 horas o más; con exactamente 2 horas se permite.
+- **Fechas:** "hoy" es la fecha actual en America/Bogota (UTC−5), aunque el dispositivo esté en otra zona horaria.
+- **Reserva = sesión:** una reserva identifica la clase y su fecha, porque `diaOffset` es relativo al día actual.
+- **RN-03:** cuenta las reservas del día de la clase, incluidas las de clases de ese día que ya comenzaron.
+- **Prioridad de mensajes:** si fallan varias reglas, se muestra RN-02, luego RN-01 y luego RN-03.
 
 ## 11. Flujo de trabajo Git (GitFlow)
 
