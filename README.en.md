@@ -4,7 +4,7 @@
 
 Mobile app that lets members of the ClaseFit gym (Laureles branch, Medellín) see upcoming group classes, book a spot and cancel their bookings from their phone. It is the MVP of KEPPRI's technical test, built with Spec-Driven Development (OpenSpec) on Expo + React Native + TypeScript.
 
-> **Repository status:** Phase 4 (change archive and release configuration). Sections marked as *pending* are completed in the phase shown.
+> **Repository status:** version 1.0.0. Full SDD cycle: proposal → specs → design → tasks → apply → verify → archive → release.
 
 ## 1. What ClaseFit is
 
@@ -178,6 +178,8 @@ The project is linked to EAS: [@nelsonrodriguezc/clasefit](https://expo.dev/acco
 
    Expected result: when it finishes, the terminal shows the APK download link.
 
+**Version 1.0.0 APK:** [`preview` build on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496). Open it on an Android phone to install it; it was verified on an Android 13 emulator ([evidence](docs/evidencias/README.md#build-de-release-eas--perfil-preview), in Spanish).
+
 To build with another Expo account, run `npx eas-cli init` with that account: the command replaces `owner` and `extra.eas.projectId` in `app.json`.
 
 What is missing to publish on Google Play and the App Store is listed in [checklist_release.md](checklist_release.md) (in Spanish).
@@ -250,5 +252,7 @@ git log --oneline --graph --all
 |---|---|
 | Functional input | [docs/insumo/insumo_funcional_ClaseFit.md](docs/insumo/insumo_funcional_ClaseFit.md) |
 | AI usage log | [bitacora_ia.md](bitacora_ia.md) |
-| Reflection answers | *pending (Phase 5)* |
+| Reflection answers | [respuestas_reflexion.md](respuestas_reflexion.md) (in Spanish) |
 | Release checklist | [checklist_release.md](checklist_release.md) |
+| Android APK (bonus) | [`preview` build 1.0.0 on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496) |
+| Smoke-test evidence | [docs/evidencias](docs/evidencias/README.md) |

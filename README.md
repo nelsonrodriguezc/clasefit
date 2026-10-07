@@ -4,7 +4,7 @@
 
 App móvil para que los socios del gimnasio ClaseFit (Sede Laureles, Medellín) vean las próximas clases grupales, reserven un cupo y cancelen sus reservas desde el celular. Es el MVP de la prueba técnica de KEPPRI, construido con Spec-Driven Development (OpenSpec) sobre Expo + React Native + TypeScript.
 
-> **Estado del repositorio:** Fase 4 (archivo del cambio y configuración de release). Las secciones marcadas como *pendiente* se completan en la fase indicada.
+> **Estado del repositorio:** versión 1.0.0. Ciclo SDD completo: proposal → specs → design → tasks → apply → verify → archive → release.
 
 ## 1. Qué es ClaseFit
 
@@ -178,6 +178,8 @@ El proyecto está vinculado a EAS: [@nelsonrodriguezc/clasefit](https://expo.dev
 
    Resultado esperado: al terminar, la terminal muestra el enlace de descarga del APK.
 
+**APK de la versión 1.0.0:** [build `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496). Ábrelo en un celular Android para instalarlo; está verificado en un emulador Android 13 ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview)).
+
 Para construir con otra cuenta de Expo, ejecuta `npx eas-cli init` con esa cuenta: el comando reemplaza `owner` y `extra.eas.projectId` en `app.json`.
 
 Lo que falta para publicar en Google Play y App Store está en [checklist_release.md](checklist_release.md).
@@ -250,5 +252,7 @@ git log --oneline --graph --all
 |---|---|
 | Insumo funcional | [docs/insumo/insumo_funcional_ClaseFit.md](docs/insumo/insumo_funcional_ClaseFit.md) |
 | Bitácora de uso de IA | [bitacora_ia.md](bitacora_ia.md) |
-| Respuestas de reflexión | *pendiente (Fase 5)* |
+| Respuestas de reflexión | [respuestas_reflexion.md](respuestas_reflexion.md) |
 | Checklist de release | [checklist_release.md](checklist_release.md) |
+| APK Android (bonus) | [build `preview` 1.0.0 en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496) |
+| Evidencias del smoke test | [docs/evidencias](docs/evidencias/README.md) |

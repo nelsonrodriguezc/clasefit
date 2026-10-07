@@ -21,7 +21,7 @@
 
 ## 4. Aplicación: puertos y casos de uso
 
-- [x] 4.1 Definir los puertos `Clock`, `ClassCatalog`, `BookingRepository`, `IdGenerator` y `Logger`, e implementar `SerialExecutor`; verificar con pruebas de ejecución en orden de tareas concurrentes y de que una tarea fallida no bloquea la cola
+- [x] 4.1 Definir los puertos `Clock`, `ClassCatalog`, `BookingRepository`, `IdGenerator` y `Logger`, e implementar la cola serial (`TaskQueue` / `SerialTaskQueue`); verificar con pruebas de ejecución en orden de tareas concurrentes y de que una tarea fallida no bloquea la cola
 - [x] 4.2 Implementar `ListUpcomingClasses` (ventana de 3 días, orden, clases iniciadas ocultas, estado por sesión, catálogo inválido → error); verificar con pruebas de orden, ventana, borde de inicio y estados `full`/`booked`
 - [x] 4.3 Implementar `BookClass` (re-validación de sesión vigente, reglas en orden, escritura serializada, falla técnica → `UNEXPECTED`); verificar con pruebas de reserva exitosa, clase ya comenzada, doble toque simultáneo y solicitudes simultáneas contra RN-03
 - [x] 4.4 Implementar `ListMyBookings` (solo no iniciadas, la más próxima primero) y `PurgeExpiredBookings` (días anteriores en Bogotá); verificar con pruebas de orden, reservas iniciadas ocultas y purga de ayer conservando mañana

@@ -5,7 +5,7 @@
 - [x] `android.package` e `ios.bundleIdentifier`: `com.keppri.clasefit.nelsonrodriguez`.
 - [x] `eas.json` con perfiles **preview** (APK de distribución interna) y **production** (AAB; `versionCode`/`buildNumber` gestionados por EAS con `appVersionSource: remote` y `autoIncrement`).
 - [x] Proyecto EAS vinculado: [@nelsonrodriguezc/clasefit](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit) (`extra.eas.projectId` y `owner` en `app.json`).
-- [ ] (Bonus) Build instalable · enlace: *build Android `preview` en curso; el enlace se agrega al terminar.*
+- [x] (Bonus) Build instalable · enlace: [build Android `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496) (abrirlo en el celular Android para instalar) · [descarga directa del APK](https://expo.dev/artifacts/eas/O4GYB3IIDeJwlVop-vrge3pnekXtO1lzfMBJIYyRtQs.apk) · versión 1.0.0 (versionCode 1), 81 MB. Verificado en emulador: funciona sin red, persiste las reservas cifradas, sin `ALLOW_BACKUP` ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview)).
 - [x] Seguridad de la configuración: `android.allowBackup: false`; `permissions: []` y `blockedPermissions` (incluye `INTERNET`: la app no usa red); privacy manifest de iOS sin rastreo ni recolección; reservas cifradas con AES-256-GCM y llave en Keystore/Keychain.
 - [x] Calidad: `npm run verify` en verde (typecheck, lint con fronteras de capas, pruebas con umbrales de cobertura y `openspec validate --all --strict`) y CI en GitHub Actions.
 - [x] Smoke test en emulador Android (Expo Go) con evidencias en [docs/evidencias](docs/evidencias/README.md), incluida la verificación de que AsyncStorage no guarda texto en claro.
@@ -58,4 +58,5 @@
 - **Llave de firma Android:** la genera EAS; si se pierde y no se usa Play App Signing, no se pueden publicar actualizaciones.
 - **Revisión legal** de la política de privacidad y del cumplimiento de exportación.
 - **Dependencias:** `npm audit --omit=dev` reporta 35 avisos (23 altos, 12 moderados) en `braces`, `node-forge`, `sprintf-js` y `uuid`, que llegan por las herramientas de compilación de `expo` y `react-native` (CLI, Metro, preset de Jest) y no forman parte del bundle de la app. La única "corrección" que propone npm es bajar de versión el SDK. Se revisan en cada ejecución de CI.
+- **Permisos declarados por librerías:** el APK incluye `USE_BIOMETRIC` y `USE_FINGERPRINT`, que agrega expo-secure-store para soportar `requireAuthentication`. Son permisos normales (sin diálogo) y la app no los usa; se pueden agregar a `blockedPermissions` en un próximo build, después de probarlo.
 - **Endurecimiento pendiente** para una versión con backend: minificación R8, certificate pinning, attestation (Play Integrity / App Attest) y detección de root/jailbreak.
