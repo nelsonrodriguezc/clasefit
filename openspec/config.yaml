@@ -1,0 +1,59 @@
+schema: spec-driven
+
+# Contexto del proyecto (en OpenSpec 1.14 reemplaza al antiguo openspec/project.md).
+# Lo inyecta el CLI en las instrucciones de cada artefacto: solo restricciones y datos
+# que un agente no deduce leyendo el código.
+context: |
+  Producto: ClaseFit, MVP para que la socia autenticada (Laura Gómez, S-0001) de un gimnasio
+  de Medellín vea las próximas clases grupales, reserve y cancele desde el celular.
+  Fuente funcional: docs/insumo/insumo_funcional_ClaseFit.md (HU-01..HU-03, RN-01..RN-04).
+
+  Stack: Expo SDK 57 + React Native 0.86 + TypeScript estricto; navegación con React Navigation
+  (pestañas "Próximas clases" y "Mis reservas"); plataformas Android e iOS (sin web).
+  Pruebas: Jest (preset jest-expo) + React Native Testing Library; la suite corre con
+  TZ=Pacific/Kiritimati (UTC+14) para detectar dependencias de la zona del dispositivo.
+
+  Estructura (Clean Architecture, SOLID sin excepción):
+  - src/domain: TypeScript puro (modelo, cálculo de fechas, reglas RN-xx). Sin React/Expo.
+  - src/application: casos de uso y puertos (Clock, ClassCatalog, BookingRepository...).
+  - src/infrastructure: adaptadores (catálogo JSON validado, AsyncStorage, cifrado, SecureStore).
+  - src/presentation: pantallas, componentes, hooks view-model y textos al usuario.
+  - src/di: composition root; App.tsx: raíz que monta dependencias y navegación.
+  - __tests__/: pruebas; __tests__/acceptance nombra cada prueba como el Scenario de la spec.
+  Fronteras entre capas verificadas por ESLint (no-restricted-imports).
+
+  Datos: catálogo local empaquetado (clases.json con diaOffset 0/1/2 y hora HH:mm), sin
+  backend. Hora de negocio America/Bogota (UTC-5 fijo, sin horario de verano).
+  Seguridad nivel fintech: reservas persistidas en AsyncStorage solo cifradas con AES-256-GCM;
+  la llave vive únicamente en el almacén seguro del sistema (Keychain/Keystore vía SecureStore);
+  falla segura (fail-closed); sin datos personales en logs; validación de esquema en fronteras.
+
+  Comandos: npm test | npm run test:coverage | npm run typecheck | npm run lint | npm run verify
+  (verify = typecheck + lint + cobertura + openspec validate --all --strict).
+
+  Idioma: todos los artefactos de OpenSpec en español. Los textos al usuario se citan
+  literalmente del insumo; cualquier texto nuevo se marca como supuesto.
+
+rules:
+  proposal:
+    - Incluir secciones de Supuestos y Fuera de alcance
+    - Trazar cada HU y cada RN del insumo a un requisito de la spec
+  specs:
+    - Cada regla RN-xx tiene su propio requisito con escenarios de éxito, rechazo y casos borde
+    - Citar entre comillas los mensajes al usuario exactamente como aparecen en el insumo
+    - Los escenarios deben poder convertirse directamente en pruebas automatizadas
+  design:
+    - Cubrir estructura del proyecto, manejo de estado, cálculo de fechas (diaOffset + hora), dónde viven las reglas de negocio y al menos una alternativa descartada
+    - Explicar cómo se cumple cada principio SOLID y las decisiones de seguridad
+  tasks:
+    - Cada tarea indica cómo se verifica (prueba, comando o comportamiento observable)
+    - Cada grupo incluye sus propias pruebas; las pruebas de reglas derivan de los escenarios
+
+operations:
+  apply:
+    guidance:
+      - Escribir primero las pruebas desde los escenarios (TDD) y luego la implementación
+      - Ejecutar npm run typecheck, npm run lint y npm test antes de marcar un grupo como terminado
+  archive:
+    guidance:
+      - Validar con openspec validate --all --strict después de archivar
