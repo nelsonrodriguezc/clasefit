@@ -4,7 +4,7 @@
 
 Mobile app that lets members of the ClaseFit gym (Laureles branch, Medellín) see upcoming group classes, book a spot and cancel their bookings from their phone. It is the MVP of KEPPRI's technical test, built with Spec-Driven Development (OpenSpec) on Expo + React Native + TypeScript.
 
-> **Repository status:** Phase 3 (implementation and verification). The app is complete and tested; sections marked as *pending* are completed in the phase shown.
+> **Repository status:** Phase 4 (change archive and release configuration). Sections marked as *pending* are completed in the phase shown.
 
 ## 1. What ClaseFit is
 
@@ -151,11 +151,36 @@ openspec validate --all --strict
 | `openspec/specs/` | Current specification, generated when a change is archived. |
 | `openspec/changes/archive/` | History of archived changes. |
 
-Change in progress: [`openspec/changes/add-class-booking/`](openspec/changes/add-class-booking/) with the [proposal](openspec/changes/add-class-booking/proposal.md), specs [class-booking](openspec/changes/add-class-booking/specs/class-booking/spec.md) and [booking-data-protection](openspec/changes/add-class-booking/specs/booking-data-protection/spec.md), [design](openspec/changes/add-class-booking/design.md) and [tasks](openspec/changes/add-class-booking/tasks.md) (written in Spanish).
+Current specification (generated when archiving): [class-booking](openspec/specs/class-booking/spec.md) and [booking-data-protection](openspec/specs/booking-data-protection/spec.md) (written in Spanish).
+
+Archived change: [`openspec/changes/archive/2026-10-06-add-class-booking/`](openspec/changes/archive/2026-10-06-add-class-booking/) with the [proposal](openspec/changes/archive/2026-10-06-add-class-booking/proposal.md), [design](openspec/changes/archive/2026-10-06-add-class-booking/design.md), [tasks](openspec/changes/archive/2026-10-06-add-class-booking/tasks.md) (30/30 tasks checked) and the delta specs.
 
 ## 7. Build and release (EAS)
 
-*Pending (Phase 4):* `preview` and `production` profiles, build commands and APK link. The list of what is missing to publish in the stores will be in [checklist_release.md](checklist_release.md).
+The project is linked to EAS: [@nelsonrodriguezc/clasefit](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit). Profiles defined in `eas.json`:
+
+| Profile | Result | Use |
+|---|---|---|
+| `preview` | Installable APK, internal distribution | Test on Android devices without going through the store. |
+| `production` | AAB (Android) and IPA (iOS) with an auto-incremented build number managed by EAS | Publish on Google Play and the App Store. |
+
+1. Log in to your Expo account:
+
+   ```bash
+   npx eas-cli login
+   ```
+
+2. Build the test APK:
+
+   ```bash
+   npx eas-cli build --platform android --profile preview
+   ```
+
+   Expected result: when it finishes, the terminal shows the APK download link.
+
+To build with another Expo account, run `npx eas-cli init` with that account: the command replaces `owner` and `extra.eas.projectId` in `app.json`.
+
+What is missing to publish on Google Play and the App Store is listed in [checklist_release.md](checklist_release.md) (in Spanish).
 
 ## 8. Architecture and security
 
@@ -169,7 +194,7 @@ Layered architecture (Clean Architecture) following SOLID principles, with bound
 | Presentation | `src/presentation` | Screens, components, hooks and user-facing copy. |
 | Composition | `src/di` and `App.tsx` | Wires implementations into use cases and mounts navigation. |
 
-The decisions (structure, state, dates, rules, encrypted persistence, SOLID map and discarded alternatives) are in [design.md](openspec/changes/add-class-booking/design.md) (in Spanish). Security summary: bookings are stored in AsyncStorage only encrypted with AES-256-GCM; the 256-bit key is generated on the device and lives only in SecureStore (Keychain on iOS, Keystore on Android); if the stored data was tampered with, it is discarded (fail-closed).
+The decisions (structure, state, dates, rules, encrypted persistence, SOLID map and discarded alternatives) are in [design.md](openspec/changes/archive/2026-10-06-add-class-booking/design.md) (in Spanish). Security summary: bookings are stored in AsyncStorage only encrypted with AES-256-GCM; the 256-bit key is generated on the device and lives only in SecureStore (Keychain on iOS, Keystore on Android); if the stored data was tampered with, it is discarded (fail-closed).
 
 ## 9. Repository structure
 
@@ -187,7 +212,7 @@ The decisions (structure, state, dates, rules, encrypted persistence, SOLID map 
 
 ## 10. Key assumptions
 
-The full list (S1 to S9) is in [proposal.md](openspec/changes/add-class-booking/proposal.md#supuestos) (in Spanish). The ones with the most impact on behaviour:
+The full list (S1 to S9) is in [proposal.md](openspec/changes/archive/2026-10-06-add-class-booking/proposal.md#supuestos) (in Spanish). The ones with the most impact on behaviour:
 
 - **RN-04:** a booking can be cancelled when 2 hours or more remain; exactly 2 hours is allowed.
 - **Dates:** "today" is the current date in America/Bogota (UTC−5), even if the device is in another time zone.
@@ -226,4 +251,4 @@ git log --oneline --graph --all
 | Functional input | [docs/insumo/insumo_funcional_ClaseFit.md](docs/insumo/insumo_funcional_ClaseFit.md) |
 | AI usage log | [bitacora_ia.md](bitacora_ia.md) |
 | Reflection answers | *pending (Phase 5)* |
-| Release checklist | *pending (Phase 4)* |
+| Release checklist | [checklist_release.md](checklist_release.md) |

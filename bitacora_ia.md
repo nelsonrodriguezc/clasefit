@@ -14,6 +14,7 @@
 | 2 | Plan | "Agrega el README de cómo correr la app y las pruebas… lenguaje coherente, sin ambigüedades… opción de idioma español o inglés." | `README.md` (español) + `README.en.md` (inglés) con selector de idioma y una prueba Jest que impide que los dos idiomas diverjan. |
 | 3 | 2 · Spec | `/opsx:propose add-class-booking` con el insumo (HU-01..03, RN-01..04) y el pedido de protección de datos. | `proposal.md` con supuestos S1–S9 y matriz de trazabilidad, specs delta `class-booking` (12 requisitos, 33 escenarios) y `booking-data-protection` (6 requisitos, 16 escenarios), `design.md` y `tasks.md` (7 grupos, 30 tareas). |
 | 4 | 3 · Apply | `/opsx:apply add-class-booking`, con la guía del proyecto de escribir primero las pruebas desde los escenarios (TDD). | 30/30 tareas marcadas; 326 pruebas en verde (42 suites); suites de aceptación con un `it` por Scenario y prueba de trazabilidad spec→pruebas; smoke test en emulador Android con capturas en `docs/evidencias/`. |
+| 5 | 4 · Archive y release | `openspec archive add-class-booking --yes`, configurar `app.json` y `eas.json` para Google Play y App Store y lanzar el build Android `preview` en la nube. | Specs vigentes en `openspec/specs/` (18 requisitos), cambio en `openspec/changes/archive/2026-10-06-add-class-booking/`, proyecto EAS vinculado, `eas.json` con `preview` y `production`, `checklist_release.md` y build en la nube en curso. |
 
 ## Errores de la IA que detecté
 | # | Qué hizo mal | Cómo lo detecté | Cómo lo resolví |
@@ -38,6 +39,7 @@
 | 1 · Setup | `npm run typecheck`, `npm run lint`, `npm test`, `npx expo-doctor` | En verde; expo-doctor 21/21 checks. |
 | 2 · Spec | Auto-revisión spec↔insumo (cada criterio de HU-01..03 y cada mensaje de RN-01..04 citado literal; reglas inventadas marcadas como supuesto) + `openspec validate add-class-booking --strict` | Válido. El usuario eligió ejecutar el ciclo de corrido: la aprobación del plan (con requisitos, escenarios y supuestos) fue la compuerta humana. |
 | 3 · Apply/Verify | `npm run verify` (typecheck, lint con fronteras de capas, 326 pruebas, umbrales de cobertura y `openspec validate --all --strict`) + trazabilidad spec→pruebas + smoke test en emulador | En verde. Cobertura: dominio y aplicación 100 % de líneas; total 99,43 % sentencias y 95,54 % ramas. En el dispositivo se verificaron reserva, "Llena", RN-03, cancelación con confirmación, RN-04 (cambiando el reloj), persistencia tras reiniciar y ausencia de texto en claro en AsyncStorage. |
+| 4 · Archive/Release | `openspec archive` (solo un aviso no bloqueante: "Consider splitting changes with more than 10 deltas") + `openspec validate --all --strict` sobre las specs vigentes + pruebas de configuración de release | En verde. Para la próxima iteración, el aviso sugiere separar cambios grandes (por ejemplo, reglas y protección de datos en dos cambios). |
 
 ## Resultado de `openspec validate`
 ```
@@ -48,4 +50,11 @@ $ openspec validate --all --strict
 - Validating...
 ✓ change/add-class-booking
 Totals: 1 passed, 0 failed (1 items)
+
+# después de archivar (Fase 4)
+$ openspec validate --all --strict
+- Validating...
+✓ spec/booking-data-protection
+✓ spec/class-booking
+Totals: 2 passed, 0 failed (2 items)
 ```
