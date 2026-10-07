@@ -106,6 +106,7 @@ Totals: 2 passed, 0 failed (2 items)
 |---|---|---|
 | 6 · Revisión de la mejora visual | Spec, diseño y tareas reescritos con `openspec validate refresh-mobile-ux-ui --strict`; pruebas primero (TDD); `npm run verify`; `npx expo-doctor`; revisión en el emulador contra el mockup | <ul><li>`openspec validate`: cambio válido.</li><li>`npm run verify`: 50 suites, 421 pruebas, 100 % de líneas, 99,45 % de sentencias, 94,63 % de ramas y ninguna salida en consola.</li><li>`expo-doctor`: 21/21 checks.</li><li>19/19 tareas.</li></ul> |
 | 7 · Archive y release 1.1.0 | `openspec archive refresh-mobile-ux-ui --yes` (aviso no bloqueante de más de 10 deltas: el cambio tiene 11 requisitos), seguido de `openspec validate --all --strict` y de las pruebas de configuración de release | En verde. Versión 1.1.0 en `app.json` y `package.json`. |
+| 8 · Build 1.1.0 | Build `preview` en EAS desde el commit con la etiqueta `v1.1.0`; el APK se instaló sobre el 1.0.0 con `adb install -r` | <ul><li>Build listo tras 31 minutos en cola y 7 de compilación. APK de 80,7 MB, versionName 1.1.0, versionCode 1.</li><li>`aapt`: mismos permisos que la 1.0.0, sin `INTERNET`.</li><li>`dumpsys`: sin `ALLOW_BACKUP` ni `DEBUGGABLE`.</li><li>Splash nativo e ícono correctos; reserva y persistencia tras `am force-stop`.</li><li>`adb root`: en el almacenamiento no aparece ningún dato legible.</li><li>Los enlaces se actualizaron con un `hotfix` de GitFlow sin cambio de versión ni etiqueta.</li></ul> |
 
 ### Resultado de `openspec validate`
 ```

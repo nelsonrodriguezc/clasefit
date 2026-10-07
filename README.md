@@ -189,7 +189,9 @@ El proyecto está vinculado a EAS: [@nelsonrodriguezc/clasefit](https://expo.dev
 
    Resultado esperado: al terminar, la terminal muestra el enlace de descarga del APK.
 
-**APK de la versión 1.0.0:** [build `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496). Ábrelo en un celular Android para instalarlo; está verificado en un emulador Android 13 ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview--versión-100)). Es anterior a la mejora visual de la 1.1.0. Para probar la 1.1.0 como APK, genera un build nuevo con el paso 2.
+**APK de la versión 1.1.0:**
+- **Enlaces:** [build `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/62714290-bb5b-49c1-aea3-15444489c69c) o [descarga directa del APK](https://expo.dev/artifacts/eas/ZC19aZxP3r_bhITYCCYnivKXpxVirQWy87CaoUXp7qc.apk) (81 MB). Ábrelo en un celular Android para instalarlo.
+- **Verificación:** en un emulador Android 13 se revisaron el splash nativo, el ícono, la reserva, la persistencia, los permisos y el cifrado en reposo ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview--versión-110)).
 
 Para construir con otra cuenta de Expo, ejecuta `npx eas-cli init` con esa cuenta: el comando reemplaza `owner` y `extra.eas.projectId` en `app.json`.
 
@@ -276,5 +278,5 @@ git log --oneline --graph --all
 | Bitácora de uso de IA | [bitacora_ia.md](bitacora_ia.md) |
 | Respuestas de reflexión | [respuestas_reflexion.md](respuestas_reflexion.md) |
 | Checklist de release | [checklist_release.md](checklist_release.md) |
-| APK Android (bonus) | [build `preview` 1.0.0 en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496), anterior a la mejora visual |
+| APK Android (bonus) | [build `preview` 1.1.0 en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/62714290-bb5b-49c1-aea3-15444489c69c) |
 | Evidencias del smoke test | [docs/evidencias](docs/evidencias/README.md) |
