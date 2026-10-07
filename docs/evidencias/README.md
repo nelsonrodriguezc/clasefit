@@ -19,53 +19,54 @@ Capturas de la **versión 1.1.0**, con la mejora visual `refresh-mobile-ux-ui`. 
 | 11 | [11-rn04-menos-de-2-horas.png](11-rn04-menos-de-2-horas.png) | RN-04: con el reloj del emulador a las 04:30 y Spinning a las 06:00, cancelar muestra "Ya no puedes cancelar: faltan menos de 2 horas." sin pedir confirmación. Después se restauró la hora. |
 
 Notas sobre las capturas:
-- **Barra de estado negra:** es de Expo Go, que no dibuja la app detrás de la barra de estado. En el build de la app, el fondo oscuro llega hasta arriba.
+- **Barra de estado negra:** es de Expo Go, que no dibuja la app detrás de la barra de estado. En el APK el fondo oscuro llega hasta arriba (ver [apk-1.1.0-reserva.png](apk-1.1.0-reserva.png)).
 - **Botón flotante de herramientas de Expo Go:** se ocultó desde su menú de desarrollo antes de tomar las capturas.
 
-## Build de release (EAS · perfil `preview`) · versión 1.0.0
+## Build de release (EAS · perfil `preview`) · versión 1.1.0
 
-Estas capturas son del APK de la **versión 1.0.0**, anterior a la mejora visual, y muestran la interfaz clara de esa versión. Se generó en la nube ([build en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496)) y se instaló con `adb install` en el mismo emulador, sin Metro ni Expo Go.
+APK generado en la nube desde el commit con la etiqueta `v1.1.0` ([build en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/62714290-bb5b-49c1-aea3-15444489c69c)). Se instaló con `adb install -r` encima del APK 1.0.0 (conservando sus datos) en el mismo emulador, sin Metro ni Expo Go. Se probó el 7 de octubre de 2026 a las 07:38.
 
 | Captura | Qué demuestra |
 |---|---|
-| [apk-1.0.0-reserva.png](apk-1.0.0-reserva.png) | El APK de release funciona sin red: lista las clases y reserva ("¡Listo! Tu cupo está reservado", 9 → 8 cupos). |
-| [apk-1.0.0-persistencia.png](apk-1.0.0-persistencia.png) | Tras `am force-stop` y reabrir, la reserva sigue en "Mis reservas". |
+| [apk-1.1.0-splash-nativo.png](apk-1.1.0-splash-nativo.png) | Splash nativo (`expo-splash-screen`): fondo `#0B1220` y marca centrada, sin destello blanco. Al pasar al splash de la app (captura 1) la marca no cambia de lugar. |
+| [apk-1.1.0-icono.png](apk-1.1.0-icono.png) | Ícono adaptativo de ClaseFit en el lanzador de Android. |
+| [apk-1.1.0-reserva.png](apk-1.1.0-reserva.png) | El APK funciona sin red y de borde a borde: reserva Funcional ("¡Listo! Tu cupo está reservado", 6 → 5 cupos). |
+| [apk-1.1.0-persistencia.png](apk-1.1.0-persistencia.png) | Tras `am force-stop` y reabrir, la reserva sigue en "Mis reservas". |
 
 ```
-$ aapt dump badging clasefit-preview.apk
-package: name='com.keppri.clasefit.nelsonrodriguez' versionCode='1' versionName='1.0.0'
+$ aapt dump badging clasefit-1.1.0-preview.apk
+package: name='com.keppri.clasefit.nelsonrodriguez' versionCode='1' versionName='1.1.0'
 sdkVersion:'24'  targetSdkVersion:'36'  application-label:'ClaseFit'
 
-$ aapt dump permissions clasefit-preview.apk
-uses-permission: android.permission.USE_BIOMETRIC      (declarado por expo-secure-store; la app no lo usa)
-uses-permission: android.permission.USE_FINGERPRINT    (declarado por expo-secure-store; la app no lo usa)
-uses-permission: <paquete>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION (interno de AndroidX)
-→ sin INTERNET, cámara, micrófono ni almacenamiento externo
+$ aapt dump permissions clasefit-1.1.0-preview.apk
+uses-permission: name='android.permission.USE_BIOMETRIC'      (declarado por expo-secure-store; la app no lo usa)
+uses-permission: name='android.permission.USE_FINGERPRINT'    (declarado por expo-secure-store; la app no lo usa)
+uses-permission: name='<paquete>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION' (interno de AndroidX)
+→ sin INTERNET, cámara, micrófono ni almacenamiento externo (igual que en la 1.0.0)
 
 $ adb shell dumpsys package com.keppri.clasefit.nelsonrodriguez
+versionName=1.1.0
 flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]   → sin ALLOW_BACKUP (copias de seguridad deshabilitadas) ni DEBUGGABLE
-
-Almacenamiento de la app (adb root): RKStorage solo contiene el sobre cifrado
-{"v":1,"alg":"A256GCM","data":"<base64>"}; no aparecen "Spinning", "Andrés", "S-0001",
-"Laura", "2026-10-07" ni "C-05". SecureStore.xml guarda clasefit.dek.v1 cifrada por Android Keystore.
 ```
 
 ## Cifrado en reposo verificado en el dispositivo
 
-Verificación hecha con la versión 1.0.0. En la 1.1.0 no cambió el almacenamiento: la mejora visual no toca el cifrado, y la prueba "Almacenamiento local sin datos legibles" sigue en verde. Con `adb root` (solo emulador) se copiaron la base de datos de AsyncStorage de la experiencia (`RKStorage-scoped-experience-…clasefit…`) y el archivo de SecureStore, y se buscó texto en claro:
+Verificación hecha con el APK 1.1.0 después de reservar Funcional de hoy a las 18:00. Con `adb root` (solo emulador) se copiaron la base de datos de AsyncStorage (`databases/RKStorage`) y el archivo de SecureStore (`shared_prefs/SecureStore.xml`) de la app, y se buscó texto en claro:
 
 ```
 clasefit.bookings.v1   PRESENT   (clave de almacenamiento)
 A256GCM                PRESENT   (sobre {"v":1,"alg":"A256GCM","data":"<base64>"})
-Yoga                   absent
-Valentina              absent
+Funcional              absent
+Camila                 absent
 S-0001                 absent
 Laura                  absent
 2026-10-07             absent
-C-07                   absent
+C-02                   absent
 SecureStore.xml contiene la entrada clasefit.dek.v1: true
 Llave hex en claro dentro de SecureStore.xml: false (cifrada por Android Keystore)
 ```
+
+La versión 1.0.0 pasó la misma revisión con otra reserva (Spinning: "Spinning", "Andrés", "S-0001", "Laura", "2026-10-07" y "C-05" ausentes).
 
 ## Defectos encontrados en el dispositivo y corregidos
 

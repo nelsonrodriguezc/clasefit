@@ -8,14 +8,17 @@
 - [x] `android.package` e `ios.bundleIdentifier`: `com.keppri.clasefit.nelsonrodriguez`.
 - [x] `eas.json` con perfiles **preview** (APK de distribución interna) y **production** (AAB; `versionCode`/`buildNumber` gestionados por EAS con `appVersionSource: remote` y `autoIncrement`).
 - [x] Proyecto EAS vinculado: [@nelsonrodriguezc/clasefit](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit) (`extra.eas.projectId` y `owner` en `app.json`).
-- [x] (Bonus) Build instalable · enlace: [build Android `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496) (abrirlo en el celular Android para instalar) · [descarga directa del APK](https://expo.dev/artifacts/eas/O4GYB3IIDeJwlVop-vrge3pnekXtO1lzfMBJIYyRtQs.apk) · versión 1.0.0 (versionCode 1), 81 MB. Verificado en emulador: funciona sin red, persiste las reservas cifradas, sin `ALLOW_BACKUP` ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview)).
+- [x] (Bonus) Build instalable de la **1.1.0**:
+  - **Enlaces:** [build Android `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/62714290-bb5b-49c1-aea3-15444489c69c) (abrirlo en el celular Android para instalar) · [descarga directa del APK](https://expo.dev/artifacts/eas/ZC19aZxP3r_bhITYCCYnivKXpxVirQWy87CaoUXp7qc.apk).
+  - **Versión:** 1.1.0 (versionCode 1), 81 MB, generada desde el commit con la etiqueta `v1.1.0`.
+  - **Verificado en el emulador:** splash nativo e ícono de la marca, funcionamiento sin red, reservas persistentes y cifradas, y ausencia de `ALLOW_BACKUP` ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview--versión-110)).
+  - **Versión anterior:** el APK 1.0.0 sigue disponible en el [build anterior](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496).
 - [x] Seguridad de la configuración: `android.allowBackup: false`; `permissions: []` y `blockedPermissions` (incluye `INTERNET`: la app no usa red); privacy manifest de iOS sin rastreo ni recolección; reservas cifradas con AES-256-GCM y llave en Keystore/Keychain.
 - [x] Calidad: `npm run verify` en verde (typecheck, lint con fronteras de capas, pruebas con umbrales de cobertura y `openspec validate --all --strict`) y CI en GitHub Actions.
-- [x] Smoke test en emulador Android (Expo Go) de la versión 1.1.0 con evidencias en [docs/evidencias](docs/evidencias/README.md), incluida la verificación de que AsyncStorage no guarda texto en claro (hecha en la 1.0.0; el almacenamiento no cambió).
+- [x] Smoke test en emulador Android de la versión 1.1.0, en Expo Go y con el APK de release, con evidencias en [docs/evidencias](docs/evidencias/README.md). Incluye la verificación de que AsyncStorage no guarda texto en claro.
 - [x] Configuración de release cubierta por pruebas: `__tests__/config/releaseConfig.test.ts`.
 
 ## Falta para Google Play
-- [ ] Generar el APK `preview` de la **1.1.0** y repetir en el dispositivo la revisión de permisos y la de cifrado en reposo. El APK enlazado arriba es el de la 1.0.0, anterior a la mejora visual; el nuevo build también permitirá ver el ícono y el splash nativo, que Expo Go no muestra.
 - [ ] Cuenta de Google Play Console (pago único de USD 25) con la verificación de identidad del desarrollador completa.
 - [ ] Crear la app en Play Console con el package `com.keppri.clasefit.nelsonrodriguez` (no se puede cambiar después de publicar).
 - [ ] Firma: activar Play App Signing. EAS genera el keystore de subida; respaldarlo con `eas credentials`.
