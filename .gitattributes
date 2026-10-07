@@ -1,0 +1,9 @@
+# Normalize line endings: LF in the repository and working tree (EAS builds run on Linux)
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.mp4 binary
+*.apk binary
+*.aab binary
