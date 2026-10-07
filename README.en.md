@@ -4,7 +4,7 @@
 
 Mobile app that lets members of the ClaseFit gym (Laureles branch, Medellín) see upcoming group classes, book a spot and cancel their bookings from their phone. It is the MVP of KEPPRI's technical test, built with Spec-Driven Development (OpenSpec) on Expo + React Native + TypeScript.
 
-> **Repository status:** Phase 1 (setup and context). Screens and business rules are implemented in Phase 3; sections marked as *pending* are completed in that phase.
+> **Repository status:** Phase 2 (proposal, specs, design and tasks). Screens and business rules are implemented in Phase 3; sections marked as *pending* are completed in the phase shown.
 
 ## 1. What ClaseFit is
 
@@ -134,7 +134,7 @@ openspec validate --all --strict
 | `openspec/specs/` | Current specification, generated when a change is archived. |
 | `openspec/changes/archive/` | History of archived changes. |
 
-*Pending (Phase 2):* link to the `add-class-booking` change.
+Change in progress: [`openspec/changes/add-class-booking/`](openspec/changes/add-class-booking/) with the [proposal](openspec/changes/add-class-booking/proposal.md), specs [class-booking](openspec/changes/add-class-booking/specs/class-booking/spec.md) and [booking-data-protection](openspec/changes/add-class-booking/specs/booking-data-protection/spec.md), [design](openspec/changes/add-class-booking/design.md) and [tasks](openspec/changes/add-class-booking/tasks.md) (written in Spanish).
 
 ## 7. Build and release (EAS)
 
@@ -152,7 +152,7 @@ Layered architecture (Clean Architecture) following SOLID principles, with bound
 | Presentation | `src/presentation` | Screens, components, hooks and user-facing copy. |
 | Composition | `src/di` and `app/` | Wires implementations into use cases; expo-router routes. |
 
-*Pending (Phase 2):* link to `design.md` with the decisions and the security model.
+The decisions (structure, state, dates, rules, encrypted persistence, SOLID map and discarded alternatives) are in [design.md](openspec/changes/add-class-booking/design.md) (in Spanish). Security summary: bookings are stored in AsyncStorage only encrypted with AES-256-GCM; the 256-bit key is generated on the device and lives only in SecureStore (Keychain on iOS, Keystore on Android); if the stored data was tampered with, it is discarded (fail-closed).
 
 ## 9. Repository structure
 
@@ -168,7 +168,13 @@ Layered architecture (Clean Architecture) following SOLID principles, with bound
 
 ## 10. Key assumptions
 
-*Pending (Phase 2):* summary of the assumptions recorded in `proposal.md`.
+The full list (S1 to S9) is in [proposal.md](openspec/changes/add-class-booking/proposal.md#supuestos) (in Spanish). The ones with the most impact on behaviour:
+
+- **RN-04:** a booking can be cancelled when 2 hours or more remain; exactly 2 hours is allowed.
+- **Dates:** "today" is the current date in America/Bogota (UTC−5), even if the device is in another time zone.
+- **Booking = session:** a booking identifies the class and its date, because `diaOffset` is relative to the current day.
+- **RN-03:** counts the bookings of the class day, including classes of that day that already started.
+- **Message priority:** if several rules fail, RN-02 is shown first, then RN-01, then RN-03.
 
 ## 11. Git workflow (GitFlow)
 
