@@ -1,4 +1,4 @@
-import { availableSpots, isBookedBy } from '@/domain/availability/availability';
+import { availableSpots, bookingOf } from '@/domain/availability/availability';
 import type { Booking } from '@/domain/model/Booking';
 import type { ClassSession } from '@/domain/model/ClassSession';
 import { scheduleWindow } from '@/domain/schedule/schedule';
@@ -32,6 +32,7 @@ const byStart = (a: ClassSession, b: ClassSession): number =>
 
 const toView = (session: ClassSession, memberBookings: readonly Booking[], today: BusinessDate): UpcomingClass => {
   const spots = availableSpots(session, memberBookings);
+  const booking = bookingOf(session, memberBookings);
   return {
     sessionId: session.id,
     classId: session.classId,
@@ -44,7 +45,8 @@ const toView = (session: ClassSession, memberBookings: readonly Booking[], today
     capacity: session.capacity,
     availableSpots: spots,
     isFull: spots === 0,
-    isBookedByMember: isBookedBy(session, memberBookings),
+    isBookedByMember: booking !== undefined,
+    bookingId: booking?.id ?? null,
   };
 };
 

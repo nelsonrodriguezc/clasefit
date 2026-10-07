@@ -59,7 +59,8 @@ describe('ListUpcomingClasses', () => {
       isFull: false,
       isBookedByMember: true,
     });
-    expect(byId['C-03']).toMatchObject({ availableSpots: 0, isFull: true, isBookedByMember: false });
+    expect(byId['C-02']?.bookingId).toBe('B-1');
+    expect(byId['C-03']).toMatchObject({ availableSpots: 0, isFull: true, isBookedByMember: false, bookingId: null });
     expect(byId['C-07']).toMatchObject({ daysFromToday: 1, availableSpots: 7, instructor: 'Valentina Ríos' });
     expect(byId['C-10']).toMatchObject({ daysFromToday: 2, availableSpots: 1 });
   });

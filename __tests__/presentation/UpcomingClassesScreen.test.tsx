@@ -1,4 +1,5 @@
 import { fireEvent, screen, within } from '@testing-library/react-native';
+import { ScrollView } from 'react-native';
 
 import { err } from '@/domain/shared/Result';
 
@@ -6,6 +7,24 @@ import { BrokenCatalog } from '../support/fakes';
 import { openTab, renderApp } from '../support/renderApp';
 
 const card = (sessionId: string) => within(screen.getByTestId(`class-${sessionId}`));
+const dayButton = (label: string) => screen.getByRole('button', { name: label });
+
+/** Gives the selector and the day sections a layout, as the device does on the first render. */
+async function layOutDays() {
+  await fireEvent(screen.getByTestId('day-selector'), 'layout', { nativeEvent: { layout: { x: 0, y: 120, width: 360, height: 64 } } });
+  for (const [day, y] of [
+    [0, 300],
+    [1, 900],
+    [2, 1500],
+  ] as const) {
+    await fireEvent(screen.getByTestId(`day-section-${day}`), 'layout', { nativeEvent: { layout: { x: 0, y, width: 360, height: 500 } } });
+  }
+}
+
+const scrollListTo = (y: number) =>
+  fireEvent.scroll(screen.getByTestId('upcoming-list'), {
+    nativeEvent: { contentOffset: { x: 0, y }, contentSize: { width: 360, height: 2200 }, layoutMeasurement: { width: 360, height: 700 } },
+  });
 
 describe('Pantalla "Próximas clases"', () => {
   it('muestra nombre, día, hora, instructor y cupos de cada clase', async () => {
@@ -17,6 +36,19 @@ describe('Pantalla "Próximas clases"', () => {
     expect(funcional.getByText('Instructor: Camila Ospina')).toBeOnTheScreen();
     expect(funcional.getByText('6 de 15 cupos')).toBeOnTheScreen();
     expect(funcional.getByRole('button', { name: /Reservar Funcional/ })).toBeOnTheScreen();
+  });
+
+  it('abre el detalle de una clase y permite volver sin perder la lista', async () => {
+    await renderApp();
+
+    await fireEvent.press(card('C-02@2026-10-06').getByRole('button', { name: /^Ver detalle de Funcional/ }));
+
+    expect(await screen.findByTestId('class-detail')).toBeOnTheScreen();
+    expect(screen.getByText('Descripción')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Volver' }));
+
+    expect(screen.queryByTestId('class-detail')).toBeNull();
+    expect(screen.getByTestId('class-C-02@2026-10-06')).toBeOnTheScreen();
   });
 
   it('no muestra las clases que ya comenzaron (Spinning de hoy a las 06:00)', async () => {
@@ -98,6 +130,48 @@ describe('Pantalla "Próximas clases"', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Cerrar' }));
 
     expect(screen.queryByText('¡Listo! Tu cupo está reservado')).toBeNull();
+  });
+
+  it('el selector de día sigue el desplazamiento de la lista', async () => {
+    await renderApp();
+    await layOutDays();
+
+    await scrollListTo(900);
+    expect(dayButton('Mañana · mié 7 oct')).toBeSelected();
+
+    await scrollListTo(1600);
+    expect(dayButton('Pasado mañana · jue 8 oct')).toBeSelected();
+
+    await scrollListTo(0);
+    expect(dayButton('Hoy · mar 6 oct')).toBeSelected();
+  });
+
+  it('elegir un día desplaza la lista hasta su sección (bajo el selector fijo) sin que el desplazamiento cambie la elección', async () => {
+    const scrollTo = jest.spyOn(ScrollView.prototype as unknown as { scrollTo: (options: object) => void }, 'scrollTo');
+    await renderApp();
+    await layOutDays();
+
+    await fireEvent.press(dayButton('Pasado mañana · jue 8 oct'));
+    await scrollListTo(200); // the animated scroll passes over the other days
+
+    expect(scrollTo).toHaveBeenCalledWith({ y: 1500 - 64, animated: true });
+    expect(dayButton('Pasado mañana · jue 8 oct')).toBeSelected();
+  });
+
+  it('el avatar de la socia lleva al perfil', async () => {
+    await renderApp();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Ver perfil' }));
+
+    expect(await screen.findByTestId('profile')).toBeOnTheScreen();
+  });
+
+  it('si no se pueden leer los datos de la socia, saluda sin nombre y sigue mostrando las clases', async () => {
+    await renderApp({ override: { getMemberProfile: { execute: async () => err('UNEXPECTED' as const) } } });
+
+    expect(screen.getByText('Hola 👋')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Ver perfil' })).toBeNull();
+    expect(screen.getByTestId('class-C-02@2026-10-06')).toBeOnTheScreen();
   });
 
   it('con un catálogo inválido muestra "No pudimos cargar las clases." y permite reintentar', async () => {

@@ -3,6 +3,7 @@ import type { Clock } from '@/application/ports/Clock';
 import type { Logger } from '@/application/ports/Logger';
 import { BookClass } from '@/application/use-cases/BookClass';
 import { CancelBooking } from '@/application/use-cases/CancelBooking';
+import { GetMemberProfile } from '@/application/use-cases/GetMemberProfile';
 import { ListMyBookings } from '@/application/use-cases/ListMyBookings';
 import { ListUpcomingClasses } from '@/application/use-cases/ListUpcomingClasses';
 import { PurgeExpiredBookings } from '@/application/use-cases/PurgeExpiredBookings';
@@ -65,5 +66,6 @@ export function createAppDependencies(overrides: CompositionOverrides = {}): App
       rules: defaultCancellationRules(),
     }),
     purgeExpiredBookings: new PurgeExpiredBookings({ bookings, memberSession, clock, queue, logger }),
+    getMemberProfile: new GetMemberProfile({ memberSession, logger }),
   };
 }

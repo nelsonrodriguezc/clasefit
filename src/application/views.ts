@@ -17,6 +17,8 @@ export interface UpcomingClass {
   readonly availableSpots: number;
   readonly isFull: boolean;
   readonly isBookedByMember: boolean;
+  /** The member's booking for this session (to cancel it from the class detail), or null. */
+  readonly bookingId: string | null;
 }
 
 /** A booking shown in "Mis reservas". */

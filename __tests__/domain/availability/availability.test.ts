@@ -1,6 +1,23 @@
-import { availableSpots, isBookedBy } from '@/domain/availability/availability';
+import { availableSpots, bookingOf, isBookedBy } from '@/domain/availability/availability';
 
 import { aBooking, aSession, TODAY, TOMORROW } from '../../support/builders';
+
+describe('Reserva de la socia en una sesión', () => {
+  it('encuentra la reserva de la socia para esa sesión exacta (clase y fecha)', () => {
+    const session = aSession({ classId: 'C-07', date: TOMORROW });
+    const sameClassOtherDay = aBooking({ id: 'B-today', classId: 'C-07', sessionDate: TODAY });
+    const thisSession = aBooking({ id: 'B-tomorrow', classId: 'C-07', sessionDate: TOMORROW });
+
+    expect(bookingOf(session, [sameClassOtherDay, thisSession])?.id).toBe('B-tomorrow');
+    expect(isBookedBy(session, [sameClassOtherDay, thisSession])).toBe(true);
+  });
+
+  it('devuelve undefined si la socia no reservó esa sesión', () => {
+    const session = aSession({ classId: 'C-07', date: TOMORROW });
+
+    expect(bookingOf(session, [aBooking({ classId: 'C-05', sessionDate: TOMORROW })])).toBeUndefined();
+  });
+});
 
 describe('Cupos disponibles', () => {
   it('Scenario: Cupos disponibles descuentan los ocupados por otros socios', () => {
