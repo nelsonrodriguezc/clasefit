@@ -9,7 +9,7 @@ const easJson = JSON.parse(readFileSync(join(root, 'eas.json'), 'utf8'));
 
 describe('Configuración de release', () => {
   it('identifica la app con nombre, slug, versión e identificadores de tienda', () => {
-    expect(appJson).toMatchObject({ name: 'ClaseFit', slug: 'clasefit', version: '1.0.0' });
+    expect(appJson).toMatchObject({ name: 'ClaseFit', slug: 'clasefit', version: '1.1.0' });
     expect(appJson.android.package).toBe('com.keppri.clasefit.nelsonrodriguez');
     expect(appJson.ios.bundleIdentifier).toBe('com.keppri.clasefit.nelsonrodriguez');
   });
