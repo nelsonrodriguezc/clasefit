@@ -19,6 +19,19 @@ describe('Pantalla "Próximas clases"', () => {
     expect(funcional.getByRole('button', { name: /Reservar Funcional/ })).toBeOnTheScreen();
   });
 
+  it('abre el detalle de una clase y permite volver sin perder la lista', async () => {
+    await renderApp();
+
+    await fireEvent.press(card('C-02@2026-10-06').getByRole('button', { name: 'Ver detalle de Funcional' }));
+
+    expect(await screen.findByTestId('class-detail')).toBeOnTheScreen();
+    expect(screen.getByText('Descripción')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Volver' }));
+
+    expect(screen.queryByTestId('class-detail')).toBeNull();
+    expect(screen.getByTestId('class-C-02@2026-10-06')).toBeOnTheScreen();
+  });
+
   it('no muestra las clases que ya comenzaron (Spinning de hoy a las 06:00)', async () => {
     await renderApp();
 

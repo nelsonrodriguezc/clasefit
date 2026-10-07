@@ -49,7 +49,7 @@ const specs = [...specFiles()].map(([capability, file]) => ({
 
 describe('Trazabilidad spec → pruebas', () => {
   it('encuentra las capacidades especificadas', () => {
-    expect(specs.map((spec) => spec.capability).sort()).toEqual(['booking-data-protection', 'class-booking']);
+    expect(specs.map((spec) => spec.capability).sort()).toEqual(['app-shell', 'booking-data-protection', 'class-booking']);
   });
 
   describe.each(specs)('Capacidad $capability', ({ capability, requirements }) => {
