@@ -4,7 +4,9 @@
 
 Mobile app that lets members of the ClaseFit gym (Laureles branch, Medellín) see upcoming group classes, book a spot and cancel their bookings from their phone. It is the MVP of KEPPRI's technical test, built with Spec-Driven Development (OpenSpec) on Expo + React Native + TypeScript.
 
-> **Repository status:** version 1.0.0. Full SDD cycle: proposal → specs → design → tasks → apply → verify → archive → release.
+> **Repository status:** version 1.1.0. Two changes went through the full SDD cycle (proposal → specs → design → tasks → apply → verify → archive → release):
+> - `add-class-booking` (1.0.0): bookings with rules RN-01 to RN-04 and data protection.
+> - `refresh-mobile-ux-ui` (1.1.0): UI based on the reference mockup.
 
 ## 1. What ClaseFit is
 
@@ -12,6 +14,7 @@ Mobile app that lets members of the ClaseFit gym (Laureles branch, Medellín) se
 - **Features:** see today's, tomorrow's and the day after tomorrow's classes; book; see and cancel my bookings.
 - **Business rules:** RN-01 to RN-04 from the functional input ([docs/insumo/insumo_funcional_ClaseFit.md](docs/insumo/insumo_funcional_ClaseFit.md), in Spanish).
 - **Data:** local. The class catalog comes from a bundled JSON file and bookings are stored encrypted on the device. There is no backend.
+- **UI:** dark theme with green accents, as in the reference mockup, with AA color contrast checked by tests.
 
 ## 2. Prerequisites
 
@@ -80,12 +83,13 @@ Expected result: `v20.x.x` or higher for Node and `10.x.x` or higher for npm.
    npx expo start --tunnel
    ```
 
-4. Use the app. It has two tabs (the UI is in Spanish):
+4. Use the app. When it opens you see the launch screen with the brand while the classes load. Then it has three tabs (the UI is in Spanish):
 
    | Tab | What it shows | What you can do |
    |---|---|---|
-   | **Próximas clases** (upcoming classes) | Today's, tomorrow's and the day after tomorrow's classes that have not started (Bogotá time), with day, time, duration, instructor and spots ("5 de 20 cupos" or "Llena" = full). | Tap **Reservar** (book). If the booking passes RN-01 to RN-03 you see "¡Listo! Tu cupo está reservado" and the class is marked **Reservada** (booked); otherwise you see the message of the rule that failed. |
+   | **Próximas clases** (upcoming classes) | <ul><li>A greeting to the member ("Hola, Laura") and her member number.</li><li>A day selector.</li><li>Today's, tomorrow's and the day after tomorrow's classes that have not started (Bogotá time), with day, time, duration, instructor and spots ("5 de 20 cupos" or "Llena" = full).</li></ul> | <ul><li>Tap a day to jump to its classes.</li><li>Tap **Reservar** (book). If the booking passes RN-01 to RN-03 you see "¡Listo! Tu cupo está reservado" and the class is marked **Reservada** (booked); otherwise you see the message of the rule that failed.</li><li>Tap a card to open its **detail** (description and benefits of the discipline). You can also book or cancel from the detail.</li></ul> |
    | **Mis reservas** (my bookings) | Your bookings of classes that have not started, closest first, or "Aún no tienes reservas" (no bookings yet). | Tap **Cancelar reserva** and confirm with **Sí, cancelar**. With less than 2 hours left you see "Ya no puedes cancelar: faltan menos de 2 horas.". |
+   | **Perfil** (profile) | The member's name and number, and how many active bookings she has. | Tap **Mis reservas** to go to that tab. |
 
    Bookings are stored encrypted on the device: they are still there after closing and reopening the app. Screenshots of every flow on an Android emulator: [docs/evidencias](docs/evidencias/README.md).
 
@@ -122,6 +126,8 @@ How the tests are organized:
 
 `npm run test:coverage` enforces minimum coverage: 100% of lines in `src/domain` and `src/application` and 95% overall; the command fails below that.
 
+A state update outside `act()` fails the test that caused it (`jest.setup.ts`). The only exception is an internal update of React Navigation's tab bar that renders nothing visible; the reason is documented in that file.
+
 Tests always run with the `Pacific/Kiritimati` time zone (UTC+14), set in `jest.config.js`. This guarantees that date calculations use Bogotá time and not the computer's time zone. Do not change the `TZ` variable when running the tests.
 
 ## 6. Specifications with OpenSpec
@@ -151,9 +157,14 @@ openspec validate --all --strict
 | `openspec/specs/` | Current specification, generated when a change is archived. |
 | `openspec/changes/archive/` | History of archived changes. |
 
-Current specification (generated when archiving): [class-booking](openspec/specs/class-booking/spec.md) and [booking-data-protection](openspec/specs/booking-data-protection/spec.md) (written in Spanish).
+Current specification (generated when archiving): [class-booking](openspec/specs/class-booking/spec.md), [booking-data-protection](openspec/specs/booking-data-protection/spec.md) and [app-shell](openspec/specs/app-shell/spec.md) (written in Spanish).
 
-Archived change: [`openspec/changes/archive/2026-10-06-add-class-booking/`](openspec/changes/archive/2026-10-06-add-class-booking/) with the [proposal](openspec/changes/archive/2026-10-06-add-class-booking/proposal.md), [design](openspec/changes/archive/2026-10-06-add-class-booking/design.md), [tasks](openspec/changes/archive/2026-10-06-add-class-booking/tasks.md) (30/30 tasks checked) and the delta specs.
+Archived changes:
+
+| Change | Version | Artifacts |
+|---|---|---|
+| [`2026-10-06-add-class-booking`](openspec/changes/archive/2026-10-06-add-class-booking/) | 1.0.0 | [proposal](openspec/changes/archive/2026-10-06-add-class-booking/proposal.md), [design](openspec/changes/archive/2026-10-06-add-class-booking/design.md), [tasks](openspec/changes/archive/2026-10-06-add-class-booking/tasks.md) (30/30 tasks checked) and delta specs |
+| [`2026-10-07-refresh-mobile-ux-ui`](openspec/changes/archive/2026-10-07-refresh-mobile-ux-ui/) | 1.1.0 | [proposal](openspec/changes/archive/2026-10-07-refresh-mobile-ux-ui/proposal.md), [design](openspec/changes/archive/2026-10-07-refresh-mobile-ux-ui/design.md) (with the table of differences from the mockup), [tasks](openspec/changes/archive/2026-10-07-refresh-mobile-ux-ui/tasks.md) (19/19 tasks checked) and delta spec |
 
 ## 7. Build and release (EAS)
 
@@ -178,7 +189,7 @@ The project is linked to EAS: [@nelsonrodriguezc/clasefit](https://expo.dev/acco
 
    Expected result: when it finishes, the terminal shows the APK download link.
 
-**Version 1.0.0 APK:** [`preview` build on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496). Open it on an Android phone to install it; it was verified on an Android 13 emulator ([evidence](docs/evidencias/README.md#build-de-release-eas--perfil-preview), in Spanish).
+**Version 1.0.0 APK:** [`preview` build on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496). Open it on an Android phone to install it; it was verified on an Android 13 emulator ([evidence](docs/evidencias/README.md#build-de-release-eas--perfil-preview--versión-100), in Spanish). It predates the visual refresh of 1.1.0. To try 1.1.0 as an APK, make a new build with step 2.
 
 To build with another Expo account, run `npx eas-cli init` with that account: the command replaces `owner` and `extra.eas.projectId` in `app.json`.
 
@@ -196,7 +207,7 @@ Layered architecture (Clean Architecture) following SOLID principles, with bound
 | Presentation | `src/presentation` | Screens, components, hooks and user-facing copy. |
 | Composition | `src/di` and `App.tsx` | Wires implementations into use cases and mounts navigation. |
 
-The decisions (structure, state, dates, rules, encrypted persistence, SOLID map and discarded alternatives) are in [design.md](openspec/changes/archive/2026-10-06-add-class-booking/design.md) (in Spanish). Security summary: bookings are stored in AsyncStorage only encrypted with AES-256-GCM; the 256-bit key is generated on the device and lives only in SecureStore (Keychain on iOS, Keystore on Android); if the stored data was tampered with, it is discarded (fail-closed).
+The decisions (structure, state, dates, rules, encrypted persistence, SOLID map and discarded alternatives) are in [design.md](openspec/changes/archive/2026-10-06-add-class-booking/design.md) (in Spanish). The UI decisions (palette and contrast, navigation, detail, splash and differences from the mockup) are in the [1.1.0 design.md](openspec/changes/archive/2026-10-07-refresh-mobile-ux-ui/design.md). Security summary: bookings are stored in AsyncStorage only encrypted with AES-256-GCM; the 256-bit key is generated on the device and lives only in SecureStore (Keychain on iOS, Keystore on Android); if the stored data was tampered with, it is discarded (fail-closed).
 
 ## 9. Repository structure
 
@@ -205,6 +216,8 @@ The decisions (structure, state, dates, rules, encrypted persistence, SOLID map 
 | `App.tsx`, `index.ts` | App root: dependencies and tab navigation. |
 | `src/` | App code by layer (`domain`, `application`, `infrastructure`, `presentation`, `di`). |
 | `__mocks__/` | Jest doubles of the native modules (real AES-GCM over WebCrypto, SecureStore and AsyncStorage). |
+| `assets/` | App icon, Android adaptive icon, splash and brand mark. The source is `assets/brand/clasefit-mark.svg`. |
+| `scripts/export-brand-assets.ps1` | Exports the PNGs in `assets/` from the brand SVG (Windows PowerShell). |
 | `docs/evidencias/` | Android smoke-test screenshots and the encryption-at-rest check. |
 | `__tests__/` | Jest tests. |
 | `openspec/` | Context, changes and specifications. |
@@ -222,14 +235,22 @@ The full list (S1 to S9) is in [proposal.md](openspec/changes/archive/2026-10-06
 - **RN-03:** counts the bookings of the class day, including classes of that day that already started.
 - **Message priority:** if several rules fail, RN-02 is shown first, then RN-01, then RN-03.
 
+UI assumptions (UI-1 to UI-7, in the [1.1.0 proposal](openspec/changes/archive/2026-10-07-refresh-mobile-ux-ui/proposal.md#supuestos)):
+
+- **Mockup and functional input:** where the mockup contradicts the input, the input wins. For example, the app keeps "¡Listo! Tu cupo está reservado".
+- **Day selector:** it does not hide classes, because HU-01 asks to see all three days. Tapping a day jumps to its section.
+- **Mockup elements out of scope:** notifications, sign-out, history and settings are not shown.
+
 ## 11. Git workflow (GitFlow)
 
 | Branch | Use |
 |---|---|
-| `main` | Released versions, tagged (`v1.0.0`). |
+| `main` | Released versions, tagged (`v1.0.0`, `v1.1.0`). |
 | `develop` | Integration of finished phases. |
-| `feature/fase-N-*` | One branch per phase, with **one commit per phase**, merged into `develop` with `--no-ff`. |
-| `release/1.0.0` | Change archive, release configuration and final documentation. |
+| `feature/phase-N-*` | 1.0.0: one branch per phase (`phase-1-setup`, `phase-2-spec`, `phase-3-apply-verify`), with **one commit per phase**, merged into `develop` with `--no-ff`. |
+| `release/1.0.0` | Change archive, release configuration and final documentation of 1.0.0. |
+| `feature/refresh-mobile-ux-ui` | 1.1.0, two commits: the first version of the visual refresh and its adjustment after the review against the mockup. |
+| `release/1.1.0` | Change archive, version 1.1.0 and documentation. |
 
 Review the full history:
 
@@ -245,6 +266,7 @@ git log --oneline --graph --all
 | Expo Go says the project uses an incompatible SDK | Update Expo Go from the store; it must support Expo SDK 57. |
 | The app shows old code or cache errors | Restart clearing the cache: `npx expo start -c`. |
 | `npm ci` fails because of the Node version | Install Node 20 or newer and run `npm ci` again. |
+| In Expo Go a floating gear button covers part of the screen | It is an Expo Go tool, not part of the app. Hide it from its developer menu with the **Tools button** option. |
 
 ## 13. Test deliverables
 
@@ -254,5 +276,5 @@ git log --oneline --graph --all
 | AI usage log | [bitacora_ia.md](bitacora_ia.md) |
 | Reflection answers | [respuestas_reflexion.md](respuestas_reflexion.md) (in Spanish) |
 | Release checklist | [checklist_release.md](checklist_release.md) |
-| Android APK (bonus) | [`preview` build 1.0.0 on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496) |
+| Android APK (bonus) | [`preview` build 1.0.0 on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496), before the visual refresh |
 | Smoke-test evidence | [docs/evidencias](docs/evidencias/README.md) |

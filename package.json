@@ -1,6 +1,6 @@
 {
   "name": "clasefit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ClaseFit: reserva de clases grupales del gimnasio (MVP Expo + TypeScript, SDD con OpenSpec)",
   "private": true,
   "main": "index.ts",
