@@ -189,7 +189,9 @@ The project is linked to EAS: [@nelsonrodriguezc/clasefit](https://expo.dev/acco
 
    Expected result: when it finishes, the terminal shows the APK download link.
 
-**Version 1.0.0 APK:** [`preview` build on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496). Open it on an Android phone to install it; it was verified on an Android 13 emulator ([evidence](docs/evidencias/README.md#build-de-release-eas--perfil-preview--versión-100), in Spanish). It predates the visual refresh of 1.1.0. To try 1.1.0 as an APK, make a new build with step 2.
+**Version 1.1.0 APK:**
+- **Links:** [`preview` build on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/62714290-bb5b-49c1-aea3-15444489c69c) or [direct APK download](https://expo.dev/artifacts/eas/ZC19aZxP3r_bhITYCCYnivKXpxVirQWy87CaoUXp7qc.apk) (81 MB). Open it on an Android phone to install it.
+- **Verification:** on an Android 13 emulator we checked the native splash, the icon, booking, persistence, permissions and encryption at rest ([evidence](docs/evidencias/README.md#build-de-release-eas--perfil-preview--versión-110), in Spanish).
 
 To build with another Expo account, run `npx eas-cli init` with that account: the command replaces `owner` and `extra.eas.projectId` in `app.json`.
 
@@ -276,5 +278,5 @@ git log --oneline --graph --all
 | AI usage log | [bitacora_ia.md](bitacora_ia.md) |
 | Reflection answers | [respuestas_reflexion.md](respuestas_reflexion.md) (in Spanish) |
 | Release checklist | [checklist_release.md](checklist_release.md) |
-| Android APK (bonus) | [`preview` build 1.0.0 on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496), before the visual refresh |
+| Android APK (bonus) | [`preview` build 1.1.0 on EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/62714290-bb5b-49c1-aea3-15444489c69c) |
 | Smoke-test evidence | [docs/evidencias](docs/evidencias/README.md) |
