@@ -62,3 +62,61 @@ $ openspec validate --all --strict
 ✓ spec/class-booking
 Totals: 2 passed, 0 failed (2 items)
 ```
+
+## Iteración 1.1.0 · mejora visual (`refresh-mobile-ux-ui`)
+
+### Cómo se trabajó
+- **Primera versión:** la generó un asistente de IA en otra sesión, a partir del mockup de referencia. Llegó al repositorio sin commit, con 9/9 tareas marcadas y `npm run verify` en verde.
+- **Revisión y cierre (Claude Code):**
+  - Revisé esa versión contra el mockup, el insumo y `CLAUDE.md`.
+  - Primero reescribí la spec, el diseño y las tareas, y después corregí con TDD.
+  - Validé en el emulador y lo integré con GitFlow (`feature/refresh-mobile-ux-ui` y `release/1.1.0`).
+- **Herramientas nuevas:**
+  - `adb` y `uiautomator` para recorrer los flujos y tomar las capturas.
+  - Windows PowerShell con GDI+ (`scripts/export-brand-assets.ps1`) para exportar la marca a PNG desde su SVG.
+  - `expo-doctor` y `npx expo config` para validar la configuración nativa.
+
+### Prompts clave
+| # | Fase | Prompt | Qué obtuve |
+|---|---|---|---|
+| 6 | 1.1.0 · Mejora visual | "Mejora visual según el mockup, sin salir del alcance del MVP" (resumen del pedido de la sesión que generó la primera versión). | Cambio `refresh-mobile-ux-ui` con spec `app-shell`, tema oscuro, splash, perfil y detalle de clase, sin commit. |
+| 7 | 1.1.0 · Revisión | "Integra el ajuste con GitFlow, revisa lo que quedó pendiente, mira si se apega el diseño al propuesto y actualiza los PNG o archivos de pruebas cuando todo esté ok." | <ul><li>Hallazgos de la revisión (tabla siguiente).</li><li>Spec reescrita: 11 requisitos y 27 escenarios concretos.</li><li>Correcciones con TDD.</li><li>Marca, ícono y splash nativo.</li><li>11 capturas nuevas en `docs/evidencias/`.</li><li>Cambio archivado y versión 1.1.0.</li></ul> |
+
+### Errores de la IA que detecté
+| # | Qué hizo mal | Cómo lo detecté | Cómo lo resolví |
+|---|---|---|---|
+| 15 | La primera versión escribió "Laura", "Laura Gómez" y "S-0001" dentro de las pantallas, en lugar de leerlos de los datos. | Revisión del diff y búsqueda de esos textos en `src/presentation`. | Caso de uso de solo lectura `GetMemberProfile`. Una prueba de aceptación con otra socia ("Marta Ruiz") demuestra que no están escritos en la pantalla. |
+| 16 | Insertó la pestaña Perfil en medio (Próximas · Perfil · Mis reservas). | Comparación con el mockup. | Orden del mockup, con una prueba que verifica el orden de las pestañas. |
+| 17 | La paleta no era la del mockup (`#081220`, `#0B1B2C`, `#A8B8C8`), y una prueba fijaba esos valores. | Comparación con la "Paleta de colores" del mockup. | Tokens exactos del mockup y una prueba que calcula el contraste WCAG de cada par de texto y fondo. |
+| 18 | Barra de estado con íconos oscuros sobre el fondo oscuro, y tema claro de React Navigation. | Revisión de `AppRoot.tsx`. | Íconos claros y tema oscuro de navegación. |
+| 19 | Puso los textos nuevos dentro de los componentes, contra la regla de `CLAUDE.md`. | Revisión del diff. | Todos los textos están en `messages.ts`. |
+| 20 | El perfil ofrecía "Notificaciones" y "Ayuda y soporte" con flecha pero sin acción. Las notificaciones están fuera del alcance del insumo. | Comparación con la sección de alcance del insumo. | Se quitaron, y el escenario "Sin opciones fuera del alcance" lo prueba. |
+| 21 | El detalle guardaba una copia de la clase: al reservar desde ahí no se actualizaba, y el mensaje quedaba oculto detrás del modal. | Lectura de `UpcomingClassesScreen` y del detalle. | El detalle lee la clase viva y muestra el aviso adentro. También permite cancelar con el mismo flujo de "Mis reservas" (`useCancellation`). |
+| 22 | Usaba la misma descripción ("alta intensidad") para todas las clases, incluidas Yoga y Rumba. | Revisión del detalle. | Descripción y etiquetas por disciplina. La de Spinning es la del mockup (supuesto UI-3). |
+| 23 | Los chips de día eran fijos ("Hoy", "Mañana", "Pasado mañana") y no hacían nada. | Revisión de la pantalla. | Selector de día que lleva a la sección del día sin ocultar las demás, como pide HU-01. |
+| 24 | La prueba del escenario "Error visible y legible" no provocaba ningún error, y la de "Reservas visibles con el nuevo estilo" usaba una lista vacía. | Lectura de cada prueba frente a su escenario. | Pruebas reescritas desde escenarios concretos (por ejemplo, el aviso de error de RN-03 con rol de alerta). |
+| 25 | El `design.md` hablaba de un detalle "anidado" en la navegación, pero el código usaba un `Modal`. | Comparación del diseño con el código. | El diseño describe lo construido (D4). |
+| 26 | En esta revisión, la flecha "Volver" del detalle quedó debajo de la barra de estado. El modal se dibuja bajo la barra, pero tomaba las medidas de área segura de la ventana principal. | Captura en el emulador. | `SafeAreaProvider` propio dentro del modal. Se verificó en el emulador, porque el doble de Jest devuelve medidas fijas. |
+| 27 | Para quitar las advertencias de `act()` probé primero esperas fijas de 50 ms, que daban resultados intermitentes, y luego simular el módulo nativo de animaciones, que rompió React Native. | Varias corridas de la suite y un registro temporal de los temporizadores: React Navigation programaba su temporizador 46 ms después de que empezaba la espera. | <ul><li>Una actualización fuera de `act()` hace fallar la prueba.</li><li>Se ignora solo la actualización interna de `BottomTabView`, con el motivo documentado.</li><li>El estado del splash pasó a su propio componente para no volver a renderizar el navegador.</li></ul> |
+| 28 | Al restaurar el reloj del emulador después de probar RN-04, usé `TZ=America/Bogota date` en Git Bash, que ignora esa zona. El emulador quedó 5 horas adelantado unos segundos. | Comparación de `adb shell date` con la hora del equipo. | Se usó la hora local del equipo, que también es UTC−5. |
+| 29 | En el dispositivo, el lema del splash se partía distinto del mockup ("Tu energía, nuestras / clases"). | Ráfaga de capturas durante el arranque en el emulador. | Salto de línea explícito después de la coma. |
+
+### Compuertas
+| Fase | Compuerta | Resultado |
+|---|---|---|
+| 6 · Revisión de la mejora visual | Spec, diseño y tareas reescritos con `openspec validate refresh-mobile-ux-ui --strict`; pruebas primero (TDD); `npm run verify`; `npx expo-doctor`; revisión en el emulador contra el mockup | <ul><li>`openspec validate`: cambio válido.</li><li>`npm run verify`: 50 suites, 421 pruebas, 100 % de líneas, 99,45 % de sentencias, 94,63 % de ramas y ninguna salida en consola.</li><li>`expo-doctor`: 21/21 checks.</li><li>19/19 tareas.</li></ul> |
+| 7 · Archive y release 1.1.0 | `openspec archive refresh-mobile-ux-ui --yes` (aviso no bloqueante de más de 10 deltas: el cambio tiene 11 requisitos), seguido de `openspec validate --all --strict` y de las pruebas de configuración de release | En verde. Versión 1.1.0 en `app.json` y `package.json`. |
+
+### Resultado de `openspec validate`
+```
+$ openspec validate refresh-mobile-ux-ui --strict
+Change 'refresh-mobile-ux-ui' is valid
+
+# después de archivar (1.1.0)
+$ openspec validate --all --strict
+- Validating...
+✓ spec/app-shell
+✓ spec/booking-data-protection
+✓ spec/class-booking
+Totals: 3 passed, 0 failed (3 items)
+```

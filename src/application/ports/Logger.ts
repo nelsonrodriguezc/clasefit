@@ -7,7 +7,8 @@ export type LogEvent =
   | 'bookings.read_failed'
   | 'bookings.write_failed'
   | 'storage.integrity_failure'
-  | 'storage.key_created';
+  | 'storage.key_created'
+  | 'member.read_failed';
 
 export type LogMeta = Readonly<Record<string, string | number | boolean>>;
 

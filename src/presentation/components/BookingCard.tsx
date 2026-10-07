@@ -2,9 +2,14 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import type { MyBooking } from '@/application/views';
 
+import { disciplineOf } from '../disciplines';
 import { dayLabel, timeLabel } from '../formatters';
-import { TEXTS } from '../messages';
-import { colors, radius, spacing } from '../theme';
+import { A11Y, TEXTS } from '../messages';
+import { colors, spacing } from '../theme';
+import { Badge } from './Badge';
+import { GlassCard } from './GlassCard';
+import { IconTile } from './IconTile';
+import { InfoRow } from './InfoRow';
 import { PrimaryButton } from './PrimaryButton';
 
 interface Props {
@@ -17,30 +22,34 @@ export function BookingCard({ booking, disabled, onCancel }: Props) {
   const when = `${dayLabel(booking.daysFromToday, booking.sessionDate)} · ${timeLabel(booking.startsAt)}`;
 
   return (
-    <View testID={`booking-${booking.id}`} style={styles.card}>
-      <Text style={styles.name}>{booking.className}</Text>
-      <Text style={styles.detail}>{`${when} · ${booking.durationMin} min`}</Text>
-      <Text style={styles.detail}>{`Instructor: ${booking.instructor}`}</Text>
+    <GlassCard testID={`booking-${booking.id}`} style={styles.card}>
+      <View style={styles.body}>
+        <IconTile icon={disciplineOf(booking.className).icon} />
+        <View style={styles.info}>
+          <View style={styles.titleRow}>
+            <Text style={styles.name}>{booking.className}</Text>
+            <Badge tone="success" label={TEXTS.booked} />
+          </View>
+          <InfoRow icon="calendar-outline">{`${when} · ${booking.durationMin} min`}</InfoRow>
+          <InfoRow icon="person-outline">{`Instructor: ${booking.instructor}`}</InfoRow>
+        </View>
+      </View>
       <PrimaryButton
         label={TEXTS.cancelBooking}
-        variant="secondary"
-        accessibilityLabel={`${TEXTS.cancelBooking} de ${booking.className}, ${when}`}
+        variant="outlineDanger"
+        icon="close-circle-outline"
+        accessibilityLabel={A11Y.cancel(booking.className, when)}
         disabled={disabled}
         onPress={() => onCancel(booking)}
       />
-    </View>
+    </GlassCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    gap: spacing.xs,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  name: { fontSize: 18, fontWeight: '700', color: colors.text },
-  detail: { fontSize: 15, color: colors.muted, marginBottom: spacing.xs },
+  card: { gap: spacing.md },
+  body: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  info: { flex: 1, gap: spacing.xs },
+  titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.sm },
+  name: { fontSize: 18, fontWeight: '800', color: colors.text, flexShrink: 1 },
 });

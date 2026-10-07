@@ -1,5 +1,5 @@
 import { parseBusinessDate } from '@/domain/time/businessTime';
-import { dayLabel, spotsLabel, timeLabel } from '@/presentation/formatters';
+import { dayChipText, dayLabel, firstNameOf, initialsOf, spotsLabel, timeLabel } from '@/presentation/formatters';
 
 import { at } from '../support/builders';
 
@@ -21,5 +21,21 @@ describe('Formatos de la interfaz', () => {
   it('spotsLabel usa el formato del insumo "5 de 20 cupos"', () => {
     expect(spotsLabel(5, 20)).toBe('5 de 20 cupos');
     expect(spotsLabel(1, 15)).toBe('1 de 15 cupos');
+  });
+
+  it('dayChipText: "Hoy" con su fecha debajo; los días siguientes, solo la fecha', () => {
+    expect(dayChipText(0, parseBusinessDate('2026-10-06'))).toEqual({ title: 'Hoy', subtitle: 'Mar 6 oct' });
+    expect(dayChipText(1, parseBusinessDate('2026-10-07'))).toEqual({ title: 'Mié 7 oct', subtitle: null });
+    expect(dayChipText(2, parseBusinessDate('2026-10-08'))).toEqual({ title: 'Jue 8 oct', subtitle: null });
+  });
+
+  it.each([
+    ['Laura Gómez', 'Laura', 'LG'],
+    ['  Marta   Ruiz López ', 'Marta', 'MR'],
+    ['laura', 'laura', 'L'],
+    ['', '', ''],
+  ])('el nombre "%s" da el primer nombre "%s" y las iniciales "%s"', (name, firstName, initials) => {
+    expect(firstNameOf(name)).toBe(firstName);
+    expect(initialsOf(name)).toBe(initials);
   });
 });

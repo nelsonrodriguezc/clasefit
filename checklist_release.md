@@ -1,17 +1,21 @@
 # Checklist de release · ClaseFit
 
 ## Listo en el proyecto
-- [x] Nombre, `slug` y versión en `app.json`: **ClaseFit** · `clasefit` · `1.0.0`.
+- [x] Nombre, `slug` y versión en `app.json`: **ClaseFit** · `clasefit` · `1.1.0`.
+- [x] Identidad visual del mockup:
+  - Ícono, ícono adaptativo de Android (con versión monocromática) y splash nativo con la marca sobre fondo `#0B1220`, configurado con `expo-splash-screen`.
+  - Fuente: `assets/brand/clasefit-mark.svg`, exportada con `scripts/export-brand-assets.ps1`.
 - [x] `android.package` e `ios.bundleIdentifier`: `com.keppri.clasefit.nelsonrodriguez`.
 - [x] `eas.json` con perfiles **preview** (APK de distribución interna) y **production** (AAB; `versionCode`/`buildNumber` gestionados por EAS con `appVersionSource: remote` y `autoIncrement`).
 - [x] Proyecto EAS vinculado: [@nelsonrodriguezc/clasefit](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit) (`extra.eas.projectId` y `owner` en `app.json`).
 - [x] (Bonus) Build instalable · enlace: [build Android `preview` en EAS](https://expo.dev/accounts/nelsonrodriguezc/projects/clasefit/builds/9c7fa5ac-dc0f-4b1b-9538-164065d13496) (abrirlo en el celular Android para instalar) · [descarga directa del APK](https://expo.dev/artifacts/eas/O4GYB3IIDeJwlVop-vrge3pnekXtO1lzfMBJIYyRtQs.apk) · versión 1.0.0 (versionCode 1), 81 MB. Verificado en emulador: funciona sin red, persiste las reservas cifradas, sin `ALLOW_BACKUP` ([evidencias](docs/evidencias/README.md#build-de-release-eas--perfil-preview)).
 - [x] Seguridad de la configuración: `android.allowBackup: false`; `permissions: []` y `blockedPermissions` (incluye `INTERNET`: la app no usa red); privacy manifest de iOS sin rastreo ni recolección; reservas cifradas con AES-256-GCM y llave en Keystore/Keychain.
 - [x] Calidad: `npm run verify` en verde (typecheck, lint con fronteras de capas, pruebas con umbrales de cobertura y `openspec validate --all --strict`) y CI en GitHub Actions.
-- [x] Smoke test en emulador Android (Expo Go) con evidencias en [docs/evidencias](docs/evidencias/README.md), incluida la verificación de que AsyncStorage no guarda texto en claro.
+- [x] Smoke test en emulador Android (Expo Go) de la versión 1.1.0 con evidencias en [docs/evidencias](docs/evidencias/README.md), incluida la verificación de que AsyncStorage no guarda texto en claro (hecha en la 1.0.0; el almacenamiento no cambió).
 - [x] Configuración de release cubierta por pruebas: `__tests__/config/releaseConfig.test.ts`.
 
 ## Falta para Google Play
+- [ ] Generar el APK `preview` de la **1.1.0** y repetir en el dispositivo la revisión de permisos y la de cifrado en reposo. El APK enlazado arriba es el de la 1.0.0, anterior a la mejora visual; el nuevo build también permitirá ver el ícono y el splash nativo, que Expo Go no muestra.
 - [ ] Cuenta de Google Play Console (pago único de USD 25) con la verificación de identidad del desarrollador completa.
 - [ ] Crear la app en Play Console con el package `com.keppri.clasefit.nelsonrodriguez` (no se puede cambiar después de publicar).
 - [ ] Firma: activar Play App Signing. EAS genera el keystore de subida; respaldarlo con `eas credentials`.
@@ -54,7 +58,11 @@
 - **Datos de demostración:** el catálogo es un JSON local sin backend; los cupos no son reales. Riesgo de rechazo por funcionalidad mínima (App Store 4.2 y políticas de calidad de Google Play).
 - **Reglas en el cliente:** RN-01 a RN-04 dependen del reloj del dispositivo; en producción deben validarse en un backend.
 - **Sin respaldo:** desinstalar la app borra las reservas (no hay sincronización; las copias de seguridad están deshabilitadas a propósito).
-- **Identidad visual:** ícono, splash y capturas son los de la plantilla de Expo.
+- **Identidad visual:**
+  - La marca y el ícono son una propuesta propia basada en el mockup; deben validarse con quien sea dueño de la marca antes de publicar.
+  - Las capturas de la tienda deben salir de un build de release, no de Expo Go.
+  - Las disciplinas usan íconos y no fotos, porque no hay imágenes con licencia.
+- **Aviso de configuración:** desde la 1.0.0, `npx expo config` advierte que `userInterfaceStyle` necesita `expo-system-ui` en Android. La app no depende de ese ajuste: dibuja su propio tema oscuro y fija íconos claros en la barra de estado.
 - **Llave de firma Android:** la genera EAS; si se pierde y no se usa Play App Signing, no se pueden publicar actualizaciones.
 - **Revisión legal** de la política de privacidad y del cumplimiento de exportación.
 - **Dependencias:** `npm audit --omit=dev` reporta 35 avisos (23 altos, 12 moderados) en `braces`, `node-forge`, `sprintf-js` y `uuid`, que llegan por las herramientas de compilación de `expo` y `react-native` (CLI, Metro, preset de Jest) y no forman parte del bundle de la app. La única "corrección" que propone npm es bajar de versión el SDK. Se revisan en cada ejecución de CI.

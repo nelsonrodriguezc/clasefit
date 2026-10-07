@@ -2,6 +2,7 @@ import { createContext, type ReactNode, useContext } from 'react';
 
 import type { BookClassUseCase } from '@/application/use-cases/BookClass';
 import type { CancelBookingUseCase } from '@/application/use-cases/CancelBooking';
+import type { GetMemberProfileUseCase } from '@/application/use-cases/GetMemberProfile';
 import type { ListMyBookingsUseCase } from '@/application/use-cases/ListMyBookings';
 import type { ListUpcomingClassesUseCase } from '@/application/use-cases/ListUpcomingClasses';
 import type { PurgeExpiredBookingsUseCase } from '@/application/use-cases/PurgeExpiredBookings';
@@ -13,6 +14,7 @@ export interface AppDependencies {
   readonly listMyBookings: ListMyBookingsUseCase;
   readonly cancelBooking: CancelBookingUseCase;
   readonly purgeExpiredBookings: PurgeExpiredBookingsUseCase;
+  readonly getMemberProfile: GetMemberProfileUseCase;
 }
 
 const DependenciesContext = createContext<AppDependencies | null>(null);
