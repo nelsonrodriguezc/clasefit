@@ -23,9 +23,9 @@ Hoy las reservas de clases del gimnasio ClaseFit (Sede Laureles, Medellín) se h
 
 ## Impact
 
-- **Código nuevo:** `app/` (rutas y pestañas), `src/domain`, `src/application`, `src/infrastructure`, `src/presentation`, `src/di` y pruebas en `__tests__/`.
-- **Dependencias nuevas:** expo-router (con react-native-safe-area-context, react-native-screens, expo-linking, expo-constants), expo-secure-store, expo-crypto, @react-native-async-storage/async-storage, @expo/vector-icons y zod. Se justifican en `design.md`.
-- **Configuración:** punto de entrada `expo-router/entry` y `android.allowBackup: false` en `app.json`.
+- **Código nuevo:** `App.tsx` (raíz y pestañas), `src/domain`, `src/application`, `src/infrastructure`, `src/presentation`, `src/di` y pruebas en `__tests__/`.
+- **Dependencias nuevas:** @react-navigation/native y @react-navigation/bottom-tabs (con react-native-screens y react-native-safe-area-context), expo-secure-store, expo-crypto, @react-native-async-storage/async-storage, @expo/vector-icons (con expo-font y expo-asset) y zod. Se justifican en `design.md`.
+- **Configuración:** plugin `expo-secure-store` y `android.allowBackup: false` en `app.json`.
 - **Sistemas externos:** ninguno; no hay backend ni red.
 
 ## Trazabilidad insumo → spec

@@ -9,7 +9,7 @@ Contexto del producto y del stack: `openspec/config.yaml` (campo `context`). Ins
 4. Antes de cada commit: `npm run verify` en verde.
 
 ## Arquitectura (SOLID sin excepción)
-- `src/domain` es TypeScript puro; `src/application` define puertos y casos de uso; `src/infrastructure` implementa puertos; `src/presentation` solo UI; `src/di` es el único lugar que instancia adaptadores; `app/` solo rutas.
+- `src/domain` es TypeScript puro; `src/application` define puertos y casos de uso; `src/infrastructure` implementa puertos; `src/presentation` solo UI; `src/di` es el único lugar que instancia adaptadores; `App.tsx` solo monta dependencias y navegación.
 - Una responsabilidad por archivo; reglas nuevas = nuevas clases de regla (no `if` en el caso de uso).
 - La UI nunca importa infraestructura ni librerías de almacenamiento/cifrado (lo impide ESLint).
 

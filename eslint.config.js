@@ -67,8 +67,8 @@ module.exports = defineConfig([
     'La UI usa casos de uso inyectados por contexto: no accede a adaptadores, almacenamiento, cifrado ni al composition root.',
   ),
   restrict(
-    ['app/**/*.{ts,tsx}'],
+    ['App.tsx', 'index.ts'],
     UI_FORBIDDEN,
-    'Las rutas solo componen pantallas y el composition root; no acceden a adaptadores, almacenamiento ni cifrado.',
+    'La raíz solo compone el composition root y la navegación; no accede a adaptadores, almacenamiento ni cifrado.',
   ),
 ]);

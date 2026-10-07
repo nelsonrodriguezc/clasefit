@@ -4,7 +4,7 @@
 
 App móvil para que los socios del gimnasio ClaseFit (Sede Laureles, Medellín) vean las próximas clases grupales, reserven un cupo y cancelen sus reservas desde el celular. Es el MVP de la prueba técnica de KEPPRI, construido con Spec-Driven Development (OpenSpec) sobre Expo + React Native + TypeScript.
 
-> **Estado del repositorio:** Fase 2 (proposal, specs, design y tasks). Las pantallas y reglas de negocio se implementan en la Fase 3; las secciones marcadas como *pendiente* se completan en la fase indicada.
+> **Estado del repositorio:** Fase 3 (implementación y verificación). La app está completa y probada; las secciones marcadas como *pendiente* se completan en la fase indicada.
 
 ## 1. Qué es ClaseFit
 
@@ -80,7 +80,14 @@ Resultado esperado: `v20.x.x` o mayor para Node y `10.x.x` o mayor para npm.
    npx expo start --tunnel
    ```
 
-*Pendiente (Fase 3):* descripción de las pantallas "Próximas clases" y "Mis reservas".
+4. Usa la app. Tiene dos pestañas:
+
+   | Pestaña | Qué muestra | Qué puedes hacer |
+   |---|---|---|
+   | **Próximas clases** | Las clases de hoy, mañana y pasado mañana que aún no comienzan (hora de Bogotá), con día, hora, duración, instructor y cupos ("5 de 20 cupos" o "Llena"). | Tocar **Reservar**. Si la reserva cumple RN-01 a RN-03, verás "¡Listo! Tu cupo está reservado" y la clase quedará marcada como **Reservada**; si no, verás el mensaje de la regla que falló. |
+   | **Mis reservas** | Tus reservas de clases que aún no comienzan, de la más próxima a la más lejana, o "Aún no tienes reservas". | Tocar **Cancelar reserva** y confirmar con **Sí, cancelar**. Si faltan menos de 2 horas, verás "Ya no puedes cancelar: faltan menos de 2 horas.". |
+
+   Las reservas se guardan cifradas en el dispositivo: siguen ahí después de cerrar y abrir la app. Capturas de cada flujo en un emulador Android: [docs/evidencias](docs/evidencias/README.md).
 
 ## 5. Ejecutar las pruebas
 
@@ -88,7 +95,7 @@ Resultado esperado: `v20.x.x` o mayor para Node y `10.x.x` o mayor para npm.
 |---|---|---|
 | Todas las pruebas | `npm test` | `Tests: N passed, N total` |
 | Pruebas con cobertura | `npm run test:coverage` | resumen en la terminal y reporte HTML en `coverage/lcov-report/index.html` |
-| Un archivo puntual | `npx jest __tests__/setup/timezone.test.ts` | `1 passed` |
+| Un archivo puntual | `npx jest __tests__/acceptance/class-booking.test.ts` | `Tests: 33 passed, 33 total` |
 | Tipos de TypeScript | `npm run typecheck` | termina sin mensajes |
 | Estilo y fronteras de capas | `npm run lint` | termina sin mensajes |
 | Todo lo anterior + OpenSpec | `npm run verify` | todos los pasos terminan sin error |
@@ -104,6 +111,16 @@ Corre la verificación completa (la misma que ejecuta la integración continua):
 ```bash
 npm run verify
 ```
+
+Cómo están organizadas las pruebas:
+
+| Carpeta | Contenido |
+|---|---|
+| `__tests__/acceptance/` | Una suite por spec: un `describe` por Requirement y un `it` por Scenario, con los mismos nombres de OpenSpec. |
+| `__tests__/traceability.test.ts` | Falla si algún Requirement o Scenario de las specs no tiene prueba. |
+| `__tests__/domain/`, `application/`, `infrastructure/`, `presentation/` | Pruebas unitarias y de integración de cada capa (incluye las reglas RN-01 a RN-04 en los bordes, el cifrado y la UI). |
+
+`npm run test:coverage` exige cobertura mínima: 100 % de líneas en `src/domain` y `src/application` y 95 % global; si baja, el comando falla.
 
 Las pruebas se ejecutan siempre con la zona horaria `Pacific/Kiritimati` (UTC+14), configurada en `jest.config.js`. Así se garantiza que el cálculo de fechas use la hora de Bogotá y no la del computador. No cambies la variable `TZ` al correr las pruebas.
 
@@ -150,7 +167,7 @@ Arquitectura por capas (Clean Architecture) con principios SOLID y fronteras ver
 | Aplicación | `src/application` | Casos de uso y puertos (interfaces). |
 | Infraestructura | `src/infrastructure` | Catálogo JSON, almacenamiento cifrado, llave segura, reloj. |
 | Presentación | `src/presentation` | Pantallas, componentes, hooks y textos al usuario. |
-| Composición | `src/di` y `app/` | Conecta implementaciones con casos de uso; rutas de expo-router. |
+| Composición | `src/di` y `App.tsx` | Conecta implementaciones con casos de uso y monta la navegación. |
 
 Las decisiones (estructura, estado, fechas, reglas, persistencia cifrada, mapa SOLID y alternativas descartadas) están en [design.md](openspec/changes/add-class-booking/design.md). Resumen de seguridad: las reservas se guardan en AsyncStorage solo cifradas con AES-256-GCM; la llave de 256 bits se genera en el dispositivo y vive únicamente en SecureStore (Keychain en iOS, Keystore en Android); si los datos guardados fueron alterados, se descartan (falla segura).
 
@@ -158,8 +175,10 @@ Las decisiones (estructura, estado, fechas, reglas, persistencia cifrada, mapa S
 
 | Ruta | Contenido |
 |---|---|
-| `app/` | Rutas de expo-router (Fase 3). |
-| `src/` | Código de la app por capas (Fase 3). |
+| `App.tsx`, `index.ts` | Raíz de la app: dependencias y navegación por pestañas. |
+| `src/` | Código de la app por capas (`domain`, `application`, `infrastructure`, `presentation`, `di`). |
+| `__mocks__/` | Dobles de Jest de los módulos nativos (AES-GCM real con WebCrypto, SecureStore y AsyncStorage). |
+| `docs/evidencias/` | Capturas del smoke test en Android y verificación del cifrado en reposo. |
 | `__tests__/` | Pruebas de Jest. |
 | `openspec/` | Contexto, cambios y especificaciones. |
 | `docs/insumo/` | Insumo funcional y datos originales entregados por KEPPRI. |

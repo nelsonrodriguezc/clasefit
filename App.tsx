@@ -1,20 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { createAppDependencies } from '@/di/createAppDependencies';
+import { AppRoot } from '@/presentation/AppRoot';
+
+// Composition happens once, when the app starts.
+const dependencies = createAppDependencies();
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>ClaseFit</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <AppRoot dependencies={dependencies} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
